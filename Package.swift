@@ -16,8 +16,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "SonifiedLLMRuntime",
-            url: "https://github.com/nate11235813/SonifiedLLMKit/releases/download/runtime-v0.1.0/SonifiedLLMRuntime.xcframework.zip",
-            checksum: "7322cd0c9b81778cb6754a2f801d920c9ded06e542c8109eb3daf0e12af103c2"
+            url: "https://github.com/nate11235813/SonifiedLLMKit/releases/download/runtime-v0.1.1/SonifiedLLMRuntime.xcframework.zip",
+            checksum: "8b4010dd75bce7e90baecff4df4980c928e0b2070a28ba6021c80e377f0ce41c"
         ),
         .target(
             name: "SonifiedLLMCore",
