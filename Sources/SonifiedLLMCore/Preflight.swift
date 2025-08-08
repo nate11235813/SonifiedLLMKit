@@ -4,6 +4,10 @@ import Foundation
 import Metal
 #endif
 
+#if canImport(SonifiedLLMRuntime)
+import SonifiedLLMRuntime
+#endif
+
 public struct SystemPreflightResult: Sendable {
     public let metalAvailable: Bool
     public let ramGB: Int

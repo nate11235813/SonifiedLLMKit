@@ -14,17 +14,14 @@ let package = Package(
         .executable(name: "CLI", targets: ["CLI"])
     ],
     targets: [
-        // Uncomment when you publish your binary
-        // .binaryTarget(
-        //     name: "SonifiedLLMRuntime",
-        //     url: "https://github.com/sonifiedscience/SonifiedLLMKit/releases/download/v0.1.0/SonifiedLLMRuntime.xcframework.zip",
-        //     checksum: "SWIFTPM_CHECKSUM_PLACEHOLDER"
-        // ),
+        .binaryTarget(
+            name: "SonifiedLLMRuntime",
+            url: "https://github.com/nate11235813/SonifiedLLMKit/releases/download/runtime-v0.1.0/SonifiedLLMRuntime.xcframework.zip",
+            checksum: "7322cd0c9b81778cb6754a2f801d920c9ded06e542c8109eb3daf0e12af103c2"
+        ),
         .target(
             name: "SonifiedLLMCore",
-            dependencies: [
-                // "SonifiedLLMRuntime" // when available
-            ],
+            dependencies: ["SonifiedLLMRuntime"],
             path: "Sources/SonifiedLLMCore"
         ),
         .target(
@@ -51,6 +48,11 @@ let package = Package(
             name: "SonifiedLLMDownloaderTests",
             dependencies: ["SonifiedLLMDownloader"],
             path: "Tests/SonifiedLLMDownloaderTests"
+        ),
+        .testTarget(
+            name: "SonifiedLLMRuntimeLinkTests",
+            dependencies: ["SonifiedLLMCore"],
+            path: "Tests/SonifiedLLMRuntimeLinkTests"
         )
     ]
 )

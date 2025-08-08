@@ -16,6 +16,16 @@ HEADERS="${HEADERS:-RuntimeShim/include}"
 
 mkdir -p "$OUT_DIR"
 
+function compile_stub() {
+  local arch="$1"
+  local sysroot="$(xcrun --sdk macosx --show-sdk-path)"
+  local out_o="$BUILD_DIR/$arch/sonified_llama_stub.o"
+  mkdir -p "$BUILD_DIR/$arch"
+  echo "==> Compiling shim stub ($arch)"
+  clang -arch "$arch" -isysroot "$sysroot" -I "$HEADERS" -std=c11 -O2 \
+    -c RuntimeShim/src/sonified_llama_stub.c -o "$out_o"
+}
+
 function combine() {
   local arch="$1"
   local outlib="$BUILD_DIR/$arch/libsonified_llama.a"
@@ -23,6 +33,7 @@ function combine() {
 
   # Candidate libs to include if present
   local libs=(
+    "$root/sonified_llama_stub.o"
     "$root/src/libllama.a"
     "$root/ggml/src/libggml.a"
     "$root/ggml/src/libggml-cpu.a"
@@ -47,14 +58,22 @@ function combine() {
   echo "    included $((${#existing[@]})) objects"
 }
 
+compile_stub arm64
+compile_stub x86_64
 combine arm64
 combine x86_64
+
+echo "==> Creating universal static lib via lipo"
+mkdir -p "$BUILD_DIR/universal"
+lipo -create \
+  "$BUILD_DIR/arm64/libsonified_llama.a" \
+  "$BUILD_DIR/x86_64/libsonified_llama.a" \
+  -output "$BUILD_DIR/universal/libsonified_llama.a"
 
 echo "==> Building XCFramework: $OUT_DIR/$FRAME.xcframework"
 rm -rf "$OUT_DIR/$FRAME.xcframework"
 xcodebuild -create-xcframework \
-  -library "$BUILD_DIR/arm64/libsonified_llama.a" -headers "$HEADERS" \
-  -library "$BUILD_DIR/x86_64/libsonified_llama.a" -headers "$HEADERS" \
+  -library "$BUILD_DIR/universal/libsonified_llama.a" -headers "$HEADERS" \
   -output "$OUT_DIR/$FRAME.xcframework"
 
 echo "==> Zipping XCFramework"
@@ -63,7 +82,8 @@ echo "==> Zipping XCFramework"
 echo "==> Computing checksum"
 swift package compute-checksum "$OUT_DIR/$FRAME.xcframework.zip" | tee "$OUT_DIR/$FRAME.checksum.txt"
 
-echo "\n==> XCFramework: $OUT_DIR/$FRAME.xcframework"
+echo "\n==> Universal lib: $BUILD_DIR/universal/libsonified_llama.a"
+echo "==> XCFramework: $OUT_DIR/$FRAME.xcframework"
 echo "==> ZIP:        $OUT_DIR/$FRAME.xcframework.zip"
 echo "==> Checksum:   $(cat "$OUT_DIR/$FRAME.checksum.txt")"
 

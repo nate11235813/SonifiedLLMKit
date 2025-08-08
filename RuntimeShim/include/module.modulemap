@@ -1,0 +1,6 @@
+module SonifiedLLMRuntime [system] {
+  header "sonified_llama.h"
+  export *
+}
+
+
