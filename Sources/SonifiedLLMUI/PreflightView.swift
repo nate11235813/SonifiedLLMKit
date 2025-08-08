@@ -1,5 +1,7 @@
 import SwiftUI
 import Foundation
+import SonifiedLLMCore
+import SonifiedLLMDownloader
 
 public struct PreflightView: View {
     @State private var text: String = ""

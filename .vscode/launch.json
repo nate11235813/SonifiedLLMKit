@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:SonifiedLLMKit}",
+            "name": "Debug CLI",
+            "program": "${workspaceFolder:SonifiedLLMKit}/.build/debug/CLI",
+            "preLaunchTask": "swift: Build Debug CLI"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:SonifiedLLMKit}",
+            "name": "Release CLI",
+            "program": "${workspaceFolder:SonifiedLLMKit}/.build/release/CLI",
+            "preLaunchTask": "swift: Build Release CLI"
+        }
+    ]
+}

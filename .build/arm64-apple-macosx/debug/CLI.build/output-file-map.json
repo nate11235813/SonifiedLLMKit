@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/CLI.build/master.swiftdeps"
+  },
+  "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Examples/CLI/main.swift": {
+    "dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/CLI.build/main.d",
+    "object": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/CLI.build/main.swift.o",
+    "swiftmodule": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/CLI.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/CLI.build/main.swiftdeps"
+  }
+}

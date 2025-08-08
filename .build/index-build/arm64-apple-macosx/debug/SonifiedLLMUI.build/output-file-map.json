@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/master.swiftdeps"
+  },
+  "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMUI/PreflightView.swift": {
+    "dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/PreflightView.d",
+    "object": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/PreflightView.swift.o",
+    "swiftmodule": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/PreflightView~partial.swiftmodule",
+    "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/PreflightView.swiftdeps"
+  }
+}

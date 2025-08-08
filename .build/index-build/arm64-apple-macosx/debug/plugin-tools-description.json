@@ -1,0 +1,1206 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.xctest/Contents/MacOS/SonifiedLLMKitPackageTests",
+      "packagePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit",
+      "productName" : "SonifiedLLMKitPackageTests"
+    }
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.CLI-arm64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/CLI.build/sources",
+      "importPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Examples/CLI/main.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMCore.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMDownloader.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/CLI.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "CLI",
+      "moduleOutputPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/CLI.swiftmodule",
+      "objects" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/CLI.build/main.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-enable-batch-mode",
+        "-Onone",
+        "-enable-testing",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-module-cache-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "CLI_main",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-Xfrontend",
+        "-experimental-lazy-typecheck",
+        "-Xfrontend",
+        "-experimental-skip-all-function-bodies",
+        "-Xfrontend",
+        "-experimental-allow-module-with-compiler-errors",
+        "-Xfrontend",
+        "-empty-abi-descriptor",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "sonifiedllmkit"
+      ],
+      "outputFileMapPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/CLI.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/CLI.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : true,
+      "sources" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Examples/CLI/main.swift"
+      ],
+      "tempsPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/CLI.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.SonifiedLLMCore-arm64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/sources",
+      "importPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/EngineFactory.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Errors.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/MockLLMEngine.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PromptBuilder.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PublicAPI.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "SonifiedLLMCore",
+      "moduleOutputPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMCore.swiftmodule",
+      "objects" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/EngineFactory.swift.o",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Errors.swift.o",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/MockLLMEngine.swift.o",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PromptBuilder.swift.o",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PublicAPI.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-enable-batch-mode",
+        "-Onone",
+        "-enable-testing",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-module-cache-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/SonifiedLLMCore-Swift.h",
+        "-swift-version",
+        "5",
+        "-Xfrontend",
+        "-experimental-lazy-typecheck",
+        "-Xfrontend",
+        "-experimental-skip-all-function-bodies",
+        "-Xfrontend",
+        "-experimental-allow-module-with-compiler-errors",
+        "-Xfrontend",
+        "-empty-abi-descriptor",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "sonifiedllmkit"
+      ],
+      "outputFileMapPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMCore.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : true,
+      "sources" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/EngineFactory.swift",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Errors.swift",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/MockLLMEngine.swift",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PromptBuilder.swift",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PublicAPI.swift"
+      ],
+      "tempsPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.SonifiedLLMCoreTests-arm64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/sources",
+      "importPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/PromptAndStreamTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMCore.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "SonifiedLLMCoreTests",
+      "moduleOutputPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMCoreTests.swiftmodule",
+      "objects" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/PromptAndStreamTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-enable-batch-mode",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-module-cache-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-Xfrontend",
+        "-experimental-lazy-typecheck",
+        "-Xfrontend",
+        "-experimental-skip-all-function-bodies",
+        "-Xfrontend",
+        "-experimental-allow-module-with-compiler-errors",
+        "-Xfrontend",
+        "-empty-abi-descriptor",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "sonifiedllmkit"
+      ],
+      "outputFileMapPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMCoreTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : true,
+      "sources" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/PromptAndStreamTests.swift"
+      ],
+      "tempsPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.SonifiedLLMDownloader-arm64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/sources",
+      "importPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/FileModelStore.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMCore.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "SonifiedLLMDownloader",
+      "moduleOutputPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMDownloader.swiftmodule",
+      "objects" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/FileModelStore.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-enable-batch-mode",
+        "-Onone",
+        "-enable-testing",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-module-cache-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/SonifiedLLMDownloader-Swift.h",
+        "-swift-version",
+        "5",
+        "-Xfrontend",
+        "-experimental-lazy-typecheck",
+        "-Xfrontend",
+        "-experimental-skip-all-function-bodies",
+        "-Xfrontend",
+        "-experimental-allow-module-with-compiler-errors",
+        "-Xfrontend",
+        "-empty-abi-descriptor",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "sonifiedllmkit"
+      ],
+      "outputFileMapPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMDownloader.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : true,
+      "sources" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/FileModelStore.swift"
+      ],
+      "tempsPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.SonifiedLLMKitPackageTests-arm64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build/sources",
+      "importPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMCoreTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "SonifiedLLMKitPackageTests",
+      "moduleOutputPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMKitPackageTests.swiftmodule",
+      "objects" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-enable-batch-mode",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-module-cache-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build/SonifiedLLMKitPackageTests-Swift.h",
+        "-Xfrontend",
+        "-experimental-lazy-typecheck",
+        "-Xfrontend",
+        "-experimental-skip-all-function-bodies",
+        "-Xfrontend",
+        "-experimental-allow-module-with-compiler-errors",
+        "-Xfrontend",
+        "-empty-abi-descriptor",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "sonifiedllmkit"
+      ],
+      "outputFileMapPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMKitPackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : true,
+      "sources" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.SonifiedLLMUI-arm64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/sources",
+      "importPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMUI/PreflightView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMCore.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMDownloader.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "SonifiedLLMUI",
+      "moduleOutputPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMUI.swiftmodule",
+      "objects" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/PreflightView.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-enable-batch-mode",
+        "-Onone",
+        "-enable-testing",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-module-cache-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/SonifiedLLMUI-Swift.h",
+        "-swift-version",
+        "5",
+        "-Xfrontend",
+        "-experimental-lazy-typecheck",
+        "-Xfrontend",
+        "-experimental-skip-all-function-bodies",
+        "-Xfrontend",
+        "-experimental-allow-module-with-compiler-errors",
+        "-Xfrontend",
+        "-empty-abi-descriptor",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "sonifiedllmkit"
+      ],
+      "outputFileMapPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules/SonifiedLLMUI.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : true,
+      "sources" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMUI/PreflightView.swift"
+      ],
+      "tempsPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "CLI" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "CLI",
+      "-package-name",
+      "sonifiedllmkit",
+      "-incremental",
+      "-c",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Examples/CLI/main.swift",
+      "-I",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-enable-batch-mode",
+      "-Onone",
+      "-enable-testing",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-module-cache-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "CLI_main",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-Xfrontend",
+      "-experimental-lazy-typecheck",
+      "-Xfrontend",
+      "-experimental-skip-all-function-bodies",
+      "-Xfrontend",
+      "-experimental-allow-module-with-compiler-errors",
+      "-Xfrontend",
+      "-empty-abi-descriptor",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "sonifiedllmkit",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "SonifiedLLMCore" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "SonifiedLLMCore",
+      "-package-name",
+      "sonifiedllmkit",
+      "-incremental",
+      "-c",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/EngineFactory.swift",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Errors.swift",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/MockLLMEngine.swift",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PromptBuilder.swift",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PublicAPI.swift",
+      "-I",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-enable-batch-mode",
+      "-Onone",
+      "-enable-testing",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-module-cache-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/SonifiedLLMCore-Swift.h",
+      "-swift-version",
+      "5",
+      "-Xfrontend",
+      "-experimental-lazy-typecheck",
+      "-Xfrontend",
+      "-experimental-skip-all-function-bodies",
+      "-Xfrontend",
+      "-experimental-allow-module-with-compiler-errors",
+      "-Xfrontend",
+      "-empty-abi-descriptor",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "sonifiedllmkit",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "SonifiedLLMCoreTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "SonifiedLLMCoreTests",
+      "-package-name",
+      "sonifiedllmkit",
+      "-incremental",
+      "-c",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/PromptAndStreamTests.swift",
+      "-I",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-enable-batch-mode",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-module-cache-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-Xfrontend",
+      "-experimental-lazy-typecheck",
+      "-Xfrontend",
+      "-experimental-skip-all-function-bodies",
+      "-Xfrontend",
+      "-experimental-allow-module-with-compiler-errors",
+      "-Xfrontend",
+      "-empty-abi-descriptor",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "sonifiedllmkit",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "SonifiedLLMDownloader" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "SonifiedLLMDownloader",
+      "-package-name",
+      "sonifiedllmkit",
+      "-incremental",
+      "-c",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/FileModelStore.swift",
+      "-I",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-enable-batch-mode",
+      "-Onone",
+      "-enable-testing",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-module-cache-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/SonifiedLLMDownloader-Swift.h",
+      "-swift-version",
+      "5",
+      "-Xfrontend",
+      "-experimental-lazy-typecheck",
+      "-Xfrontend",
+      "-experimental-skip-all-function-bodies",
+      "-Xfrontend",
+      "-experimental-allow-module-with-compiler-errors",
+      "-Xfrontend",
+      "-empty-abi-descriptor",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "sonifiedllmkit",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "SonifiedLLMKitPackageTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "SonifiedLLMKitPackageTests",
+      "-package-name",
+      "sonifiedllmkit",
+      "-incremental",
+      "-c",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.derived/runner.swift",
+      "-I",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-enable-batch-mode",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-module-cache-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build/SonifiedLLMKitPackageTests-Swift.h",
+      "-Xfrontend",
+      "-experimental-lazy-typecheck",
+      "-Xfrontend",
+      "-experimental-skip-all-function-bodies",
+      "-Xfrontend",
+      "-experimental-allow-module-with-compiler-errors",
+      "-Xfrontend",
+      "-empty-abi-descriptor",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "sonifiedllmkit",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "SonifiedLLMUI" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "SonifiedLLMUI",
+      "-package-name",
+      "sonifiedllmkit",
+      "-incremental",
+      "-c",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMUI/PreflightView.swift",
+      "-I",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-enable-batch-mode",
+      "-Onone",
+      "-enable-testing",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-module-cache-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/SonifiedLLMUI-Swift.h",
+      "-swift-version",
+      "5",
+      "-Xfrontend",
+      "-experimental-lazy-typecheck",
+      "-Xfrontend",
+      "-experimental-skip-all-function-bodies",
+      "-Xfrontend",
+      "-experimental-allow-module-with-compiler-errors",
+      "-Xfrontend",
+      "-empty-abi-descriptor",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "sonifiedllmkit",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "CLI" : [
+      "SonifiedLLMDownloader",
+      "SonifiedLLMCore"
+    ],
+    "SonifiedLLMCore" : [
+
+    ],
+    "SonifiedLLMCoreTests" : [
+      "SonifiedLLMCore"
+    ],
+    "SonifiedLLMDownloader" : [
+      "SonifiedLLMCore"
+    ],
+    "SonifiedLLMKitPackageTests" : [
+      "SonifiedLLMCoreTests",
+      "SonifiedLLMCore"
+    ],
+    "SonifiedLLMUI" : [
+      "SonifiedLLMDownloader",
+      "SonifiedLLMCore"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+
+  },
+  "traitConfiguration" : {
+    "enableAllTraits" : false
+  },
+  "writeCommands" : {
+    "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/CLI.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Examples/CLI/main.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/CLI.build/sources"
+    },
+    "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/EngineFactory.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Errors.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/MockLLMEngine.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PromptBuilder.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PublicAPI.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/sources"
+    },
+    "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/PromptAndStreamTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/sources"
+    },
+    "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/FileModelStore.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/sources"
+    },
+    "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build/sources"
+    },
+    "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMUI/PreflightView.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/sources"
+    },
+    "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}

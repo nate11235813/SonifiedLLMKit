@@ -1,0 +1,4 @@
+module SonifiedLLMDownloader {
+    header "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/SonifiedLLMDownloader-Swift.h"
+    requires objc
+}

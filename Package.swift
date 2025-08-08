@@ -29,12 +29,12 @@ let package = Package(
         ),
         .target(
             name: "SonifiedLLMDownloader",
-            dependencies: [],
+            dependencies: ["SonifiedLLMCore"],
             path: "Sources/SonifiedLLMDownloader"
         ),
         .target(
             name: "SonifiedLLMUI",
-            dependencies: ["SonifiedLLMCore"],
+            dependencies: ["SonifiedLLMCore", "SonifiedLLMDownloader"],
             path: "Sources/SonifiedLLMUI"
         ),
         .executableTarget(

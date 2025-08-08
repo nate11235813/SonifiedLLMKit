@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/master.swiftdeps"
+  },
+  "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/FileModelStore.swift": {
+    "dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/FileModelStore.d",
+    "object": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/FileModelStore.swift.o",
+    "swiftmodule": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/FileModelStore~partial.swiftmodule",
+    "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/FileModelStore.swiftdeps"
+  }
+}
