@@ -14,7 +14,30 @@ BUILD_DIR="${BUILD_DIR:-build/runtime}"
 FRAME="${FRAME:-SonifiedLLMRuntime}"
 HEADERS="${HEADERS:-RuntimeShim/include}"
 
+# Toolchain binaries (use Xcode tools)
+CLANG="$(xcrun -f clang)"
+LIBTOOL="$(xcrun -f libtool)"
+XCODEBUILD="$(xcrun -f xcodebuild)"
+LIPO="$(xcrun -f lipo)"
+
 mkdir -p "$OUT_DIR"
+
+export MACOSX_DEPLOYMENT_TARGET=13.0
+
+# Prerequisite checks
+if [[ ! -d vendor/llama.cpp || ! -f vendor/llama.cpp/CMakeLists.txt ]]; then
+  echo "error: vendor/llama.cpp not found or missing CMakeLists.txt." >&2
+  echo "hint: Initialize submodules: git submodule update --init --recursive" >&2
+  exit 1
+fi
+
+if [[ ! -f "$BUILD_DIR/arm64/src/libllama.a" || ! -f "$BUILD_DIR/x86_64/src/libllama.a" ]]; then
+  echo "error: Missing built static libs. Expected:" >&2
+  echo "  $BUILD_DIR/arm64/src/libllama.a" >&2
+  echo "  $BUILD_DIR/x86_64/src/libllama.a" >&2
+  echo "hint: Run scripts/build_runtime_static.sh first" >&2
+  exit 1
+fi
 
 function compile_stub() {
   local arch="$1"
@@ -22,7 +45,7 @@ function compile_stub() {
   local out_o="$BUILD_DIR/$arch/sonified_llama_stub.o"
   mkdir -p "$BUILD_DIR/$arch"
   echo "==> Compiling shim stub ($arch)"
-  clang -arch "$arch" -isysroot "$sysroot" -I "$HEADERS" -std=c11 -O2 \
+  "$CLANG" -arch "$arch" -isysroot "$sysroot" -mmacosx-version-min=13.0 -I "$HEADERS" -std=c11 -O2 \
     -c RuntimeShim/src/sonified_llama_stub.c -o "$out_o"
 }
 
@@ -54,7 +77,7 @@ function combine() {
   fi
 
   echo "==> Creating unified static lib ($arch): $outlib"
-  libtool -static -o "$outlib" "${existing[@]}"
+  "$LIBTOOL" -static -o "$outlib" "${existing[@]}"
   echo "    included $((${#existing[@]})) objects"
 }
 
@@ -65,14 +88,16 @@ combine x86_64
 
 echo "==> Creating universal static lib via lipo"
 mkdir -p "$BUILD_DIR/universal"
-lipo -create \
+"$LIPO" -create \
   "$BUILD_DIR/arm64/libsonified_llama.a" \
   "$BUILD_DIR/x86_64/libsonified_llama.a" \
   -output "$BUILD_DIR/universal/libsonified_llama.a"
 
 echo "==> Building XCFramework: $OUT_DIR/$FRAME.xcframework"
+# Clean stale artifacts
 rm -rf "$OUT_DIR/$FRAME.xcframework"
-xcodebuild -create-xcframework \
+rm -f "$OUT_DIR/$FRAME.xcframework.zip" "$OUT_DIR/$FRAME.checksum.txt"
+"$XCODEBUILD" -create-xcframework \
   -library "$BUILD_DIR/universal/libsonified_llama.a" -headers "$HEADERS" \
   -output "$OUT_DIR/$FRAME.xcframework"
 
