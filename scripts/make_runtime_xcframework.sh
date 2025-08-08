@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Combines per-arch static libraries from llama.cpp into a unified archive per arch
+# and creates SonifiedLLMRuntime.xcframework using public headers in RuntimeShim/include.
+#
+# Prereqs:
+# - Run scripts/build_runtime_static.sh first (to produce static libs under build/runtime/...)
+# - Xcode + Command Line Tools installed (xcode-select -p)
+# - If SDK not found, set: export SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+
+OUT_DIR="${OUT_DIR:-dist}"
+BUILD_DIR="${BUILD_DIR:-build/runtime}"
+FRAME="${FRAME:-SonifiedLLMRuntime}"
+HEADERS="${HEADERS:-RuntimeShim/include}"
+
+mkdir -p "$OUT_DIR"
+
+function combine() {
+  local arch="$1"
+  local outlib="$BUILD_DIR/$arch/libsonified_llama.a"
+  local root="$BUILD_DIR/$arch"
+
+  # Candidate libs to include if present
+  local libs=(
+    "$root/src/libllama.a"
+    "$root/ggml/src/libggml.a"
+    "$root/ggml/src/libggml-cpu.a"
+    "$root/ggml/src/ggml-metal/libggml-metal.a"
+    "$root/ggml/src/ggml-blas/libggml-blas.a"
+    "$root/ggml/src/libggml-base.a"
+    "$root/common/libcommon.a"
+  )
+
+  local existing=()
+  for f in "${libs[@]}"; do
+    if [[ -f "$f" ]]; then existing+=("$f"); fi
+  done
+
+  if [[ ${#existing[@]} -eq 0 ]]; then
+    echo "error: No static libs found under $root. Did you run scripts/build_runtime_static.sh?" >&2
+    exit 1
+  fi
+
+  echo "==> Creating unified static lib ($arch): $outlib"
+  libtool -static -o "$outlib" "${existing[@]}"
+  echo "    included $((${#existing[@]})) objects"
+}
+
+combine arm64
+combine x86_64
+
+echo "==> Building XCFramework: $OUT_DIR/$FRAME.xcframework"
+rm -rf "$OUT_DIR/$FRAME.xcframework"
+xcodebuild -create-xcframework \
+  -library "$BUILD_DIR/arm64/libsonified_llama.a" -headers "$HEADERS" \
+  -library "$BUILD_DIR/x86_64/libsonified_llama.a" -headers "$HEADERS" \
+  -output "$OUT_DIR/$FRAME.xcframework"
+
+echo "==> Zipping XCFramework"
+(cd "$OUT_DIR" && zip -r "$FRAME.xcframework.zip" "$FRAME.xcframework" >/dev/null)
+
+echo "==> Computing checksum"
+swift package compute-checksum "$OUT_DIR/$FRAME.xcframework.zip" | tee "$OUT_DIR/$FRAME.checksum.txt"
+
+echo "\n==> XCFramework: $OUT_DIR/$FRAME.xcframework"
+echo "==> ZIP:        $OUT_DIR/$FRAME.xcframework.zip"
+echo "==> Checksum:   $(cat "$OUT_DIR/$FRAME.checksum.txt")"
+
+

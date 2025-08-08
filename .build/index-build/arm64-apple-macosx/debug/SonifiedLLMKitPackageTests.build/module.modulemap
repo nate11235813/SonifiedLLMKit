@@ -1,4 +1,0 @@
-module SonifiedLLMKitPackageTests {
-    header "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build/SonifiedLLMKitPackageTests-Swift.h"
-    requires objc
-}

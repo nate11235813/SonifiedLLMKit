@@ -1,4 +1,0 @@
-module SonifiedLLMUI {
-    header "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMUI.build/SonifiedLLMUI-Swift.h"
-    requires objc
-}

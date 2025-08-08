@@ -1,4 +1,0 @@
-module SonifiedLLMCore {
-    header "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/SonifiedLLMCore-Swift.h"
-    requires objc
-}

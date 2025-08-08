@@ -1,0 +1,9 @@
+# SwiftPM build products
+.build/
+
+# Local build outputs
+build/
+dist/
+
+# macOS metadata
+.DS_Store
