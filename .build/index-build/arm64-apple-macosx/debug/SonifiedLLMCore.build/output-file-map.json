@@ -26,6 +26,12 @@
     "swiftmodule": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/MockLLMEngine~partial.swiftmodule",
     "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/MockLLMEngine.swiftdeps"
   },
+  "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Preflight.swift": {
+    "dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Preflight.d",
+    "object": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Preflight.swift.o",
+    "swiftmodule": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Preflight~partial.swiftmodule",
+    "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Preflight.swiftdeps"
+  },
   "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PromptBuilder.swift": {
     "dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PromptBuilder.d",
     "object": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PromptBuilder.swift.o",

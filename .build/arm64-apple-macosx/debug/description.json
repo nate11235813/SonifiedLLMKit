@@ -146,6 +146,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Preflight.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PromptBuilder.swift"
         },
         {
@@ -169,6 +173,7 @@
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Errors.swift.o",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/LLMEngineImpl.swift.o",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/MockLLMEngine.swift.o",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Preflight.swift.o",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PromptBuilder.swift.o",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PublicAPI.swift.o"
       ],
@@ -243,6 +248,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Preflight.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PromptBuilder.swift.o"
         },
         {
@@ -260,6 +269,7 @@
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Errors.swift",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/LLMEngineImpl.swift",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/MockLLMEngine.swift",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Preflight.swift",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PromptBuilder.swift",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PublicAPI.swift"
       ],
@@ -888,6 +898,7 @@
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Errors.swift",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/LLMEngineImpl.swift",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/MockLLMEngine.swift",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Preflight.swift",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PromptBuilder.swift",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PublicAPI.swift",
       "-I",
@@ -1369,6 +1380,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Preflight.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PromptBuilder.swift.o"
         },
         {
@@ -1416,6 +1431,10 @@
         {
           "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/MockLLMEngine.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Preflight.swift"
         },
         {
           "kind" : "file",
@@ -1526,6 +1545,10 @@
         {
           "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/MockLLMEngine.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Preflight.swift.o"
         },
         {
           "kind" : "file",
