@@ -2,6 +2,7 @@ import Foundation
 import CryptoKit
 
 public protocol ModelDownloadDelegate: AnyObject, Sendable {
+    // Progress callbacks are delivered on the main actor.
     func modelDownloadDidUpdateProgress(bytesReceived: Int64, totalBytes: Int64?)
 }
 
@@ -9,6 +10,7 @@ public enum DownloaderError: Error {
     case downloadFailed(status: Int)
     case checksumMismatch
     case ioFailure(underlying: Error)
+    case resumeInvalid
 }
 
 public final class ModelDownloader: @unchecked Sendable {
@@ -24,6 +26,8 @@ public final class ModelDownloader: @unchecked Sendable {
             config.waitsForConnectivity = true
             config.allowsExpensiveNetworkAccess = true
             config.allowsConstrainedNetworkAccess = true
+            config.timeoutIntervalForRequest = 60
+            config.timeoutIntervalForResource = 600
             self.session = URLSession(configuration: config)
         }
     }
@@ -47,7 +51,12 @@ public final class ModelDownloader: @unchecked Sendable {
 
                 // Verify checksum against tmp
                 let ok = try verifyChecksum(of: tmpURL, expectedHex: manifest.sha256)
-                if !ok { throw DownloaderError.checksumMismatch }
+                if !ok {
+                    try? FileManager.default.removeItem(at: destination)
+                    try? FileManager.default.removeItem(at: tmpURL)
+                    try? FileManager.default.removeItem(at: etagSidecarURL(for: tmpURL))
+                    throw DownloaderError.checksumMismatch
+                }
 
                 // Atomic-ish move to destination
                 let fm = FileManager.default
@@ -57,22 +66,30 @@ public final class ModelDownloader: @unchecked Sendable {
                 try fm.moveItem(at: tmpURL, to: destination)
                 return
             } catch let error as DownloaderError {
-                // Retry on 5xx only; other errors rethrow
+                // Retry on specific statuses or resume-invalid conditions
                 switch error {
-                case .downloadFailed(let status) where (500...599).contains(status) && attempt < 2:
+                case .resumeInvalid where attempt < 3:
                     attempt += 1
                     try? await Task.sleep(nanoseconds: delayMs * 1_000_000)
-                    delayMs = min(delayMs * 4, 2_000)
+                    delayMs = min(delayMs * 2, 2_000)
+                    continue
+                case .downloadFailed(let status) where ([408, 429].contains(status) || (500...599).contains(status)) && attempt < 3:
+                    attempt += 1
+                    try? await Task.sleep(nanoseconds: delayMs * 1_000_000)
+                    delayMs = min(delayMs * 2, 2_000)
                     continue
                 default:
                     throw error
                 }
+            } catch is CancellationError {
+                // Propagate cancellation; keep partial .tmp for resume
+                throw CancellationError()
             } catch {
-                // IO or networking error: wrap and maybe retry (treat as 500)
-                if attempt < 2 {
+                // IO or networking error: retry a few times
+                if attempt < 3 {
                     attempt += 1
                     try? await Task.sleep(nanoseconds: delayMs * 1_000_000)
-                    delayMs = min(delayMs * 4, 2_000)
+                    delayMs = min(delayMs * 2, 2_000)
                     continue
                 }
                 throw DownloaderError.ioFailure(underlying: error)
@@ -85,12 +102,17 @@ public final class ModelDownloader: @unchecked Sendable {
 
         let fm = FileManager.default
         var existingBytes: Int64 = 0
+        var storedETag: String? = nil
         if fm.fileExists(atPath: tmpURL.path),
            let attrs = try? fm.attributesOfItem(atPath: tmpURL.path),
            let size = attrs[.size] as? NSNumber {
             existingBytes = size.int64Value
             if existingBytes > 0 {
                 request.setValue("bytes=\(existingBytes)-", forHTTPHeaderField: "Range")
+                storedETag = try? String(contentsOf: etagSidecarURL(for: tmpURL), encoding: .utf8)
+                if let storedETag, !storedETag.isEmpty {
+                    request.setValue(storedETag.trimmingCharacters(in: .whitespacesAndNewlines), forHTTPHeaderField: "If-Range")
+                }
             }
         }
 
@@ -116,6 +138,24 @@ public final class ModelDownloader: @unchecked Sendable {
             totalBytes = existingBytes + http.expectedContentLength
         }
 
+        // Validate resume integrity if resuming
+        if existingBytes > 0 {
+            let currentETag = http.value(forHTTPHeaderField: "ETag")
+            let contentRange = http.value(forHTTPHeaderField: "Content-Range")
+            let startsAtExpected = contentRange?.lowercased().hasPrefix("bytes \(existingBytes)-") ?? false
+            let etagMatches = (storedETag == nil) || (currentETag == nil) || (storedETag?.trimmingCharacters(in: .whitespacesAndNewlines) == currentETag?.trimmingCharacters(in: .whitespacesAndNewlines))
+            if !(status == 206 && startsAtExpected && etagMatches) {
+                try? fm.removeItem(at: tmpURL)
+                try? fm.removeItem(at: etagSidecarURL(for: tmpURL))
+                throw DownloaderError.resumeInvalid
+            }
+        }
+
+        // Persist latest ETag
+        if let etag = http.value(forHTTPHeaderField: "ETag"), !etag.isEmpty {
+            try? etag.write(to: etagSidecarURL(for: tmpURL), atomically: true, encoding: .utf8)
+        }
+
         // Prepare file handle
         if !fm.fileExists(atPath: tmpURL.path) {
             fm.createFile(atPath: tmpURL.path, contents: nil)
@@ -136,17 +176,33 @@ public final class ModelDownloader: @unchecked Sendable {
                 let data = Data(buffer)
                 try handle.write(contentsOf: data)
                 received += Int64(data.count)
-                delegate?.modelDownloadDidUpdateProgress(bytesReceived: received, totalBytes: totalBytes)
+                if let delegate = delegate {
+                    let progressReceived = received
+                    let progressTotal = totalBytes
+                    await MainActor.run {
+                        delegate.modelDownloadDidUpdateProgress(bytesReceived: progressReceived, totalBytes: progressTotal)
+                    }
+                }
                 buffer.removeAll(keepingCapacity: true)
             }
+            try Task.checkCancellation()
         }
         if !buffer.isEmpty {
             let data = Data(buffer)
             try handle.write(contentsOf: data)
             received += Int64(data.count)
-            delegate?.modelDownloadDidUpdateProgress(bytesReceived: received, totalBytes: totalBytes)
+            if let delegate = delegate {
+                let progressReceived = received
+                let progressTotal = totalBytes
+                await MainActor.run {
+                    delegate.modelDownloadDidUpdateProgress(bytesReceived: progressReceived, totalBytes: progressTotal)
+                }
+            }
             buffer.removeAll(keepingCapacity: true)
         }
+
+        // Flush before verification/move
+        try? handle.synchronize()
     }
 
     private func verifyChecksum(of fileURL: URL, expectedHex: String) throws -> Bool {
@@ -164,6 +220,10 @@ public final class ModelDownloader: @unchecked Sendable {
         let digest = hasher.finalize()
         let hex = digest.map { String(format: "%02x", $0) }.joined()
         return hex == expectedHex.lowercased()
+    }
+
+    private func etagSidecarURL(for tmpURL: URL) -> URL {
+        tmpURL.appendingPathExtension("etag")
     }
 }
 

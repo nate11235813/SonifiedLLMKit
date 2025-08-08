@@ -2,6 +2,12 @@
   "": {
     "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/master.swiftdeps"
   },
+  "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMDownloaderTests/DownloaderStub.swift": {
+    "dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/DownloaderStub.d",
+    "object": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/DownloaderStub.swift.o",
+    "swiftmodule": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/DownloaderStub~partial.swiftmodule",
+    "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/DownloaderStub.swiftdeps"
+  },
   "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMDownloaderTests/DownloaderTests.swift": {
     "dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/DownloaderTests.d",
     "object": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/DownloaderTests.swift.o",
