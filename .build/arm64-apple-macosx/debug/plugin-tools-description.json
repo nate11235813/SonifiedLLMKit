@@ -138,6 +138,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/LLMEngineImpl.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/MockLLMEngine.swift"
         },
         {
@@ -163,6 +167,7 @@
       "objects" : [
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/EngineFactory.swift.o",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Errors.swift.o",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/LLMEngineImpl.swift.o",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/MockLLMEngine.swift.o",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PromptBuilder.swift.o",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PublicAPI.swift.o"
@@ -230,6 +235,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/LLMEngineImpl.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/MockLLMEngine.swift.o"
         },
         {
@@ -249,6 +258,7 @@
       "sources" : [
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/EngineFactory.swift",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Errors.swift",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/LLMEngineImpl.swift",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/MockLLMEngine.swift",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PromptBuilder.swift",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PublicAPI.swift"
@@ -261,6 +271,10 @@
       "fileList" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/sources",
       "importPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules",
       "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/ModelManifestTests.swift"
+        },
         {
           "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/PromptAndStreamTests.swift"
@@ -282,6 +296,7 @@
       "moduleName" : "SonifiedLLMCoreTests",
       "moduleOutputPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules/SonifiedLLMCoreTests.swiftmodule",
       "objects" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/ModelManifestTests.swift.o",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/PromptAndStreamTests.swift.o"
       ],
       "otherArguments" : [
@@ -338,6 +353,10 @@
       "outputs" : [
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/ModelManifestTests.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/PromptAndStreamTests.swift.o"
         },
         {
@@ -347,6 +366,7 @@
       ],
       "prepareForIndexing" : false,
       "sources" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/ModelManifestTests.swift",
         "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/PromptAndStreamTests.swift"
       ],
       "tempsPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build",
@@ -360,6 +380,18 @@
         {
           "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/FileModelStore.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelCachePolicy.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelDownloader.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelManifest.swift"
         },
         {
           "kind" : "file",
@@ -378,7 +410,10 @@
       "moduleName" : "SonifiedLLMDownloader",
       "moduleOutputPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules/SonifiedLLMDownloader.swiftmodule",
       "objects" : [
-        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/FileModelStore.swift.o"
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/FileModelStore.swift.o",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelCachePolicy.swift.o",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelDownloader.swift.o",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelManifest.swift.o"
       ],
       "otherArguments" : [
         "-target",
@@ -439,14 +474,125 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelCachePolicy.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelDownloader.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelManifest.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules/SonifiedLLMDownloader.swiftmodule"
         }
       ],
       "prepareForIndexing" : false,
       "sources" : [
-        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/FileModelStore.swift"
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/FileModelStore.swift",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelCachePolicy.swift",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelDownloader.swift",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelManifest.swift"
       ],
       "tempsPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.SonifiedLLMDownloaderTests-arm64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/sources",
+      "importPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMDownloaderTests/DownloaderTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules/SonifiedLLMDownloader.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "SonifiedLLMDownloaderTests",
+      "moduleOutputPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules/SonifiedLLMDownloaderTests.swiftmodule",
+      "objects" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/DownloaderTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-enable-batch-mode",
+        "-index-store-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j12",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-module-cache-path",
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "sonifiedllmkit"
+      ],
+      "outputFileMapPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/DownloaderTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules/SonifiedLLMDownloaderTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMDownloaderTests/DownloaderTests.swift"
+      ],
+      "tempsPath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build",
       "wholeModuleOptimization" : false
     },
     "C.SonifiedLLMKitPackageTests-arm64-apple-macosx15.0-debug.module" : {
@@ -461,6 +607,10 @@
         {
           "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules/SonifiedLLMDownloaderTests.swiftmodule"
         },
         {
           "kind" : "file",
@@ -726,6 +876,7 @@
       "-c",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/EngineFactory.swift",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Errors.swift",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/LLMEngineImpl.swift",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/MockLLMEngine.swift",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PromptBuilder.swift",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/PublicAPI.swift",
@@ -791,6 +942,7 @@
       "sonifiedllmkit",
       "-incremental",
       "-c",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/ModelManifestTests.swift",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/PromptAndStreamTests.swift",
       "-I",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules",
@@ -854,6 +1006,9 @@
       "-incremental",
       "-c",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/FileModelStore.swift",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelCachePolicy.swift",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelDownloader.swift",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelManifest.swift",
       "-I",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules",
       "-target",
@@ -873,6 +1028,68 @@
       "-emit-objc-header",
       "-emit-objc-header-path",
       "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/SonifiedLLMDownloader-Swift.h",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "sonifiedllmkit",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "SonifiedLLMDownloaderTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "SonifiedLLMDownloaderTests",
+      "-package-name",
+      "sonifiedllmkit",
+      "-incremental",
+      "-c",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMDownloaderTests/DownloaderTests.swift",
+      "-I",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-enable-batch-mode",
+      "-index-store-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j12",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-module-cache-path",
+      "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
       "-color-diagnostics",
       "-swift-version",
       "5",
@@ -1049,8 +1266,14 @@
     "SonifiedLLMDownloader" : [
       "SonifiedLLMCore"
     ],
+    "SonifiedLLMDownloaderTests" : [
+      "SonifiedLLMDownloader",
+      "SonifiedLLMCore"
+    ],
     "SonifiedLLMKitPackageTests" : [
       "SonifiedLLMCoreTests",
+      "SonifiedLLMDownloaderTests",
+      "SonifiedLLMDownloader",
       "SonifiedLLMCore"
     ],
     "SonifiedLLMUI" : [
@@ -1127,6 +1350,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/LLMEngineImpl.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/MockLLMEngine.swift.o"
         },
         {
@@ -1140,6 +1367,18 @@
         {
           "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/FileModelStore.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelCachePolicy.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelDownloader.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelManifest.swift.o"
         }
       ],
       "outputFilePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/CLI.product/Objects.LinkFileList"
@@ -1158,6 +1397,10 @@
         {
           "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/Errors.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMCore/LLMEngineImpl.swift"
         },
         {
           "kind" : "file",
@@ -1183,6 +1426,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/ModelManifestTests.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/PromptAndStreamTests.swift"
         }
       ],
@@ -1198,9 +1445,35 @@
         {
           "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/FileModelStore.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelCachePolicy.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelDownloader.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Sources/SonifiedLLMDownloader/ModelManifest.swift"
         }
       ],
       "outputFilePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/sources"
+    },
+    "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMDownloaderTests/DownloaderTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/sources"
     },
     "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMKitPackageTests.build/sources" : {
       "alwaysOutOfDate" : false,
@@ -1233,6 +1506,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/LLMEngineImpl.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/MockLLMEngine.swift.o"
         },
         {
@@ -1245,7 +1522,31 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/ModelManifestTests.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/PromptAndStreamTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/FileModelStore.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelCachePolicy.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelDownloader.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelManifest.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloaderTests.build/DownloaderTests.swift.o"
         },
         {
           "kind" : "file",

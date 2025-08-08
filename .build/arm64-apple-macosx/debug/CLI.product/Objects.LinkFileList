@@ -1,7 +1,11 @@
 /Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/CLI.build/main.swift.o
 /Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/EngineFactory.swift.o
 /Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/Errors.swift.o
+/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/LLMEngineImpl.swift.o
 /Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/MockLLMEngine.swift.o
 /Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PromptBuilder.swift.o
 /Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMCore.build/PublicAPI.swift.o
 /Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/FileModelStore.swift.o
+/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelCachePolicy.swift.o
+/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelDownloader.swift.o
+/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/arm64-apple-macosx/debug/SonifiedLLMDownloader.build/ModelManifest.swift.o

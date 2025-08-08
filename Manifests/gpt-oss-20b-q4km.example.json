@@ -1,0 +1,9 @@
+{
+  "name": "gpt-oss-20b",
+  "quant": "Q4_K_M",
+  "size_bytes": 1234567890,
+  "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "uri": "https://example.com/models/gpt-oss-20b-q4km.gguf"
+}
+
+

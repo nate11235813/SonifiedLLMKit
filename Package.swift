@@ -17,7 +17,7 @@ let package = Package(
         // Uncomment when you publish your binary
         // .binaryTarget(
         //     name: "SonifiedLLMRuntime",
-        //     url: "https://example.com/SonifiedLLMRuntime.xcframework.zip",
+        //     url: "https://github.com/sonifiedscience/SonifiedLLMKit/releases/download/v0.1.0/SonifiedLLMRuntime.xcframework.zip",
         //     checksum: "SWIFTPM_CHECKSUM_PLACEHOLDER"
         // ),
         .target(
@@ -46,6 +46,11 @@ let package = Package(
             name: "SonifiedLLMCoreTests",
             dependencies: ["SonifiedLLMCore"],
             path: "Tests/SonifiedLLMCoreTests"
+        ),
+        .testTarget(
+            name: "SonifiedLLMDownloaderTests",
+            dependencies: ["SonifiedLLMDownloader"],
+            path: "Tests/SonifiedLLMDownloaderTests"
         )
     ]
 )

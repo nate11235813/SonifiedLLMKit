@@ -2,6 +2,12 @@
   "": {
     "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/master.swiftdeps"
   },
+  "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/ModelManifestTests.swift": {
+    "dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/ModelManifestTests.d",
+    "object": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/ModelManifestTests.swift.o",
+    "swiftmodule": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/ModelManifestTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/ModelManifestTests.swiftdeps"
+  },
   "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/Tests/SonifiedLLMCoreTests/PromptAndStreamTests.swift": {
     "dependencies": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/PromptAndStreamTests.d",
     "object": "/Users/nhunt/Documents/GitHub/SonifiedLLMKit/.build/index-build/arm64-apple-macosx/debug/SonifiedLLMCoreTests.build/PromptAndStreamTests.swift.o",
