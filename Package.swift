@@ -22,7 +22,12 @@ let package = Package(
         .target(
             name: "SonifiedLLMCore",
             dependencies: ["SonifiedLLMRuntime"],
-            path: "Sources/SonifiedLLMCore"
+            path: "Sources/SonifiedLLMCore",
+            linkerSettings: [
+                .linkedFramework("Accelerate"),
+                .linkedFramework("Metal"),
+                .linkedFramework("Foundation")
+            ]
         ),
         .target(
             name: "SonifiedLLMDownloader",
