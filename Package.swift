@@ -14,10 +14,15 @@ let package = Package(
         .executable(name: "CLI", targets: ["CLI"])
     ],
     targets: [
+        // Local dev (uncomment to use local build):
+        // .binaryTarget(
+        //   name: "SonifiedLLMRuntime",
+        //   path: "dist/SonifiedLLMRuntime.xcframework"
+        // ),
         .binaryTarget(
             name: "SonifiedLLMRuntime",
-            url: "https://github.com/nate11235813/SonifiedLLMKit/releases/download/runtime-v0.1.2/SonifiedLLMRuntime.xcframework.zip",
-            checksum: "774b02e99ad9c41f0b906e643b4eefaedea57da95615fe172a1489e91ba594b2"
+            url: "https://github.com/<your-org>/<your-repo>/releases/download/<tag>/SonifiedLLMRuntime.xcframework.zip",
+            checksum: "48f6cd0fb8238cb97a21a413edd477e24fc2a80d9f62609f111af4cfbcbb7e10"
         ),
         .target(
             name: "SonifiedLLMCore",
