@@ -50,6 +50,7 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                 return
             }
             self.stateQueue.sync { self.isCancelledFlag = false }
+            let startTimeNs = DispatchTime.now().uptimeNanoseconds
             var cOpts = llm_gen_opts_t(
                 context_length:  Int32(options.maxTokens + 512), // simple default window
                 temperature:     options.temperature,
@@ -58,41 +59,86 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                 seed:            Int32(options.seed ?? 0)
             )
             // Box the continuation for the C callback
-            final class Box { let cont: AsyncThrowingStream<LLMEvent, Error>.Continuation; init(_ c: AsyncThrowingStream<LLMEvent, Error>.Continuation){ cont = c } }
-            let box = Unmanaged.passRetained(Box(continuation))
+            final class Box {
+                let cont: AsyncThrowingStream<LLMEvent, Error>.Continuation
+                var earlyMetricsSent: Bool = false
+                let startTimeNs: UInt64
+                init(_ c: AsyncThrowingStream<LLMEvent, Error>.Continuation, startTimeNs: UInt64) {
+                    self.cont = c
+                    self.startTimeNs = startTimeNs
+                }
+            }
+            let box = Unmanaged.passRetained(Box(continuation, startTimeNs: startTimeNs))
             let ctx = UnsafeMutableRawPointer(box.toOpaque())
             // Non-capturing C callback
             let cb: @convention(c) (UnsafePointer<CChar>?, UnsafeMutableRawPointer?) -> Void = { token, ctx in
                 guard let ctx = ctx else { return }
                 let box = Unmanaged<Box>.fromOpaque(ctx).takeUnretainedValue()
                 if let token = token {
+                    if box.earlyMetricsSent == false {
+                        box.earlyMetricsSent = true
+                        let now = DispatchTime.now().uptimeNanoseconds
+                        let ttfbMs = Int((now &- box.startTimeNs) / 1_000_000)
+                        box.cont.yield(.metrics(LLMMetrics(ttfbMillis: ttfbMs)))
+                    }
                     box.cont.yield(.token(String(cString: token)))
                 }
             }
             self.currentTask = Task.detached { [weak self] in
                 guard let self else { return }
+                #if DEBUG
+                if prompt == "CAUSE_EVAL_FAIL" {
+                    continuation.finish(throwing: LLMError.runtimeFailure(code: -1))
+                    box.release()
+                    return
+                }
+                #endif
                 let evalRc: Int32 = prompt.withCString { cstr in
                     llm_eval(h, cstr, &cOpts, cb, ctx)
                 }
                 var s = llm_stats_t(ttfb_ms: 0, tok_per_sec: 0, total_ms: 0, peak_rss_mb: 0, success: 0)
-                let statsRc = llm_stats(h, &s)
-                let m = LLMMetrics(
-                    chip: "unknown",
-                    ramGB: 0,
-                    quant: "Q4_K_M",
-                    context: Int(cOpts.context_length),
-                    ttfbMillis: Int(s.ttfb_ms),
-                    tokPerSec: Double(s.tok_per_sec),
-                    totalDurationMillis: Int(s.total_ms),
-                    peakRSSMB: Int(s.peak_rss_mb),
-                    success: s.success != 0
-                )
-                self.stateQueue.sync { self._stats = m }
-                continuation.yield(.metrics(m))
+                var statsRc = llm_stats(h, &s)
+                #if DEBUG
+                if prompt == "CAUSE_STATS_FAIL" { statsRc = -1 }
+                #endif
+                let wasCancelled = self.stateQueue.sync { self.isCancelledFlag }
+                if wasCancelled {
+                    let m = LLMMetrics(
+                        chip: "unknown",
+                        ramGB: 0,
+                        quant: "Q4_K_M",
+                        context: Int(cOpts.context_length),
+                        ttfbMillis: Int(s.ttfb_ms),
+                        tokPerSec: Double(s.tok_per_sec),
+                        totalDurationMillis: Int(s.total_ms),
+                        peakRSSMB: Int(s.peak_rss_mb),
+                        success: false
+                    )
+                    self.stateQueue.sync { self._stats = m }
+                    continuation.yield(.metrics(m))
+                    continuation.yield(.done)
+                    continuation.finish()
+                    box.release()
+                    return
+                }
+
                 if evalRc != 0 || statsRc != 0 {
                     let code = evalRc != 0 ? Int(evalRc) : Int(statsRc)
                     continuation.finish(throwing: LLMError.runtimeFailure(code: code))
                 } else {
+                    let m = LLMMetrics(
+                        chip: "unknown",
+                        ramGB: 0,
+                        quant: "Q4_K_M",
+                        context: Int(cOpts.context_length),
+                        ttfbMillis: Int(s.ttfb_ms),
+                        tokPerSec: Double(s.tok_per_sec),
+                        totalDurationMillis: Int(s.total_ms),
+                        peakRSSMB: Int(s.peak_rss_mb),
+                        success: s.success != 0
+                    )
+                    self.stateQueue.sync { self._stats = m }
+                    continuation.yield(.metrics(m))
                     continuation.yield(.done)
                     continuation.finish()
                 }

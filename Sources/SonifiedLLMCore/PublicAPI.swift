@@ -38,7 +38,7 @@ public struct GenerateOptions: Sendable {
 
 // MARK: - Metrics & Events
 
-public struct LLMMetrics: Sendable {
+public struct LLMMetrics: Sendable, Equatable {
     public let chip: String
     public let ramGB: Int
     public let macOSVersion: String
@@ -73,7 +73,20 @@ public struct LLMMetrics: Sendable {
     }
 }
 
-public enum LLMEvent: Sendable {
+///
+/// Event ordering contract:
+/// 1) Optional early `.metrics` exactly once when first token is ready (TTFB).
+/// 2) Zero or more `.token(String)` events streamed in order.
+/// 3) One final `.metrics` with totals for the run.
+/// 4) `.done` exactly once on successful or cancelled completion.
+///
+/// Errors:
+/// - Fatal errors throw and MUST NOT emit `.done`.
+/// - User cancellation MUST emit final `.metrics` (success=false) then `.done` (no throw).
+///
+/// Timing:
+/// - Engines MUST stop producing `.token` within ~150 ms of `cancelCurrent()`.
+public enum LLMEvent: Sendable, Equatable {
     case token(String)
     case metrics(LLMMetrics)
     case done
@@ -84,8 +97,19 @@ public enum LLMEvent: Sendable {
 public protocol LLMEngine: AnyObject, Sendable {
     func load(modelURL: URL, spec: LLMModelSpec) async throws
     func unload() async
+    /// Start generating tokens for the given prompt.
+    ///
+    /// Streams follow the `LLMEvent` ordering contract:
+    /// - Optional early `.metrics` exactly once at time-to-first-token (TTFB).
+    /// - Zero or more `.token(String)` events.
+    /// - One final `.metrics` containing totals (tokens/sec, total duration, token counts, success flag).
+    /// - `.done` exactly once on successful or cancelled completion.
+    ///
+    /// Errors mid-generation are delivered via `AsyncThrowingStream` throws — `.done` is never emitted when throwing.
+    /// Cancellation MUST stop token emission within ~150 ms and still emit a final `.metrics` (success=false) then `.done`.
     func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error>
     func cancelCurrent()
+    /// A snapshot of the last run's final `.metrics`. This is not live-updating.
     var stats: LLMMetrics { get }
 }
 

@@ -21,10 +21,16 @@ struct App {
             let start = Date()
 
             var sawFirstToken = false
+            var sawFirstMetrics = false
             for try await ev in engine.generate(prompt: prompt, options: .init(maxTokens: 64)) {
                 switch ev {
                 case .metrics(let m):
-                    fputs(String(format: "TTFB: %d ms\n", m.ttfbMillis), stderr)
+                    if !sawFirstMetrics {
+                        sawFirstMetrics = true
+                        fputs(String(format: "TTFB: %d ms\n", m.ttfbMillis), stderr)
+                    } else {
+                        fputs(String(format: "tok/s: %.2f  total: %d ms  success: %@\n", m.tokPerSec, m.totalDurationMillis, m.success ? "true" : "false"), stderr)
+                    }
                 case .token(let t):
                     if !sawFirstToken {
                         sawFirstToken = true

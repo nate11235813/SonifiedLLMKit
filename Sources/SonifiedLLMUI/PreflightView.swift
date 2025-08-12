@@ -9,6 +9,7 @@ public struct PreflightView: View {
     @State private var ttfb: Int = 0
     @State private var system: SystemPreflightResult? = nil
     @State private var smokeMetrics: LLMMetrics? = nil
+    @State private var runFinalMetrics: LLMMetrics? = nil
 
     public init() {}
 
@@ -51,6 +52,13 @@ public struct PreflightView: View {
             }
             ScrollView { Text(output).frame(maxWidth: .infinity, alignment: .leading) }
                 .border(.gray.opacity(0.2))
+            if let m = runFinalMetrics {
+                GroupBox("Run Totals") {
+                    Text("tok/s: \(String(format: "%.2f", m.tokPerSec))")
+                    Text("total: \(m.totalDurationMillis) ms")
+                    Text("success: \(m.success ? "true" : "false")")
+                }
+            }
             if let m = smokeMetrics {
                 GroupBox("Smoke Metrics") {
                     Text("TTFB: \(m.ttfbMillis) ms")
@@ -80,6 +88,7 @@ public struct PreflightView: View {
     private func run() {
         Task {
             output = ""
+            runFinalMetrics = nil
             let engine = EngineFactory.makeDefaultEngine()
             let store = FileModelStore()
             let spec = LLMModelSpec(name: "gpt-oss-20b", quant: "Q4_K_M", context: 4096)
@@ -87,10 +96,13 @@ public struct PreflightView: View {
             try? await engine.load(modelURL: url ?? URL(fileURLWithPath: "/dev/null"), spec: spec)
             let stream = engine.generate(prompt: text, options: .init(maxTokens: 64))
             do {
+                var sawFirstMetrics = false
                 for try await ev in stream {
                     switch ev {
                     case .token(let t): output.append(t)
-                    case .metrics(let m): ttfb = m.ttfbMillis
+                    case .metrics(let m):
+                        if !sawFirstMetrics { ttfb = m.ttfbMillis; sawFirstMetrics = true }
+                        else { runFinalMetrics = m }
                     case .done: break
                     }
                 }

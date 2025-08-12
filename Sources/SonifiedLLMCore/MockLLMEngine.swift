@@ -4,6 +4,7 @@ final class MockLLMEngine: LLMEngine {
     private var isLoaded = false
     private var currentTask: Task<Void, Never>?
     private var _stats = LLMMetrics()
+    private var isCancelledFlag = false
 
     public var stats: LLMMetrics { _stats }
 
@@ -19,8 +20,8 @@ final class MockLLMEngine: LLMEngine {
     }
 
     func cancelCurrent() {
+        isCancelledFlag = true
         currentTask?.cancel()
-        currentTask = nil
     }
 
     func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error> {
@@ -31,6 +32,7 @@ final class MockLLMEngine: LLMEngine {
             }
 
             let start = DispatchTime.now().uptimeNanoseconds
+            self.isCancelledFlag = false
             currentTask = Task {
                 // Simulate TTFB
                 try? await Task.sleep(nanoseconds: 300_000_000) // 300ms
@@ -46,7 +48,7 @@ final class MockLLMEngine: LLMEngine {
 
                 let tokenDelayNs: UInt64 = 40_000_000 // 25 tok/s
                 for w in words {
-                    if Task.isCancelled { break }
+                    if Task.isCancelled || isCancelledFlag { break }
                     continuation.yield(.token(w + " "))
                     tokensEmitted += 1
                     try? await Task.sleep(nanoseconds: tokenDelayNs)
@@ -54,9 +56,12 @@ final class MockLLMEngine: LLMEngine {
                 }
 
                 let total = Int((DispatchTime.now().uptimeNanoseconds - start) / 1_000_000)
-                let tps = tokensEmitted > 0 ? Double(tokensEmitted) / (Double(total - ttfb) / 1000.0) : 0
+                let tps = tokensEmitted > 0 && total > ttfb ? Double(tokensEmitted) / (Double(total - ttfb) / 1000.0) : 0
 
-                _stats = LLMMetrics(ttfbMillis: ttfb, tokPerSec: tps, totalDurationMillis: total, success: true)
+                // final metrics (success reflects cancellation)
+                let finalMetrics = LLMMetrics(ttfbMillis: ttfb, tokPerSec: tps, totalDurationMillis: total, success: !isCancelledFlag)
+                _stats = finalMetrics
+                continuation.yield(.metrics(finalMetrics))
                 continuation.yield(.done)
                 continuation.finish()
             }
