@@ -86,12 +86,16 @@ public struct PreflightView: View {
             let url = try? await store.ensureAvailable(spec: spec)
             try? await engine.load(modelURL: url ?? URL(fileURLWithPath: "/dev/null"), spec: spec)
             let stream = engine.generate(prompt: text, options: .init(maxTokens: 64))
-            for await ev in stream {
-                switch ev {
-                case .token(let t): output.append(t)
-                case .metrics(let m): ttfb = m.ttfbMillis
-                case .done: break
+            do {
+                for try await ev in stream {
+                    switch ev {
+                    case .token(let t): output.append(t)
+                    case .metrics(let m): ttfb = m.ttfbMillis
+                    case .done: break
+                    }
                 }
+            } catch {
+                output.append("\nError: \(error.localizedDescription)\n")
             }
             await engine.unload()
         }

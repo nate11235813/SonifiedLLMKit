@@ -84,7 +84,7 @@ public enum LLMEvent: Sendable {
 public protocol LLMEngine: AnyObject, Sendable {
     func load(modelURL: URL, spec: LLMModelSpec) async throws
     func unload() async
-    func generate(prompt: String, options: GenerateOptions) -> AsyncStream<LLMEvent>
+    func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error>
     func cancelCurrent()
     var stats: LLMMetrics { get }
 }

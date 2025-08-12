@@ -21,7 +21,7 @@ struct App {
             let start = Date()
 
             var sawFirstToken = false
-            for await ev in engine.generate(prompt: prompt, options: .init(maxTokens: 64)) {
+            for try await ev in engine.generate(prompt: prompt, options: .init(maxTokens: 64)) {
                 switch ev {
                 case .metrics(let m):
                     fputs(String(format: "TTFB: %d ms\n", m.ttfbMillis), stderr)

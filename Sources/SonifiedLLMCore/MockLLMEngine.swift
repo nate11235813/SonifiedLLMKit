@@ -23,16 +23,14 @@ final class MockLLMEngine: LLMEngine {
         currentTask = nil
     }
 
-    func generate(prompt: String, options: GenerateOptions) -> AsyncStream<LLMEvent> {
-        guard isLoaded else {
-            return AsyncStream { cont in
-                cont.yield(.metrics(LLMMetrics(success: false)))
-                cont.finish()
+    func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error> {
+        AsyncThrowingStream { continuation in
+            guard isLoaded else {
+                continuation.finish(throwing: LLMError.notLoaded)
+                return
             }
-        }
 
-        let start = DispatchTime.now().uptimeNanoseconds
-        return AsyncStream { continuation in
+            let start = DispatchTime.now().uptimeNanoseconds
             currentTask = Task {
                 // Simulate TTFB
                 try? await Task.sleep(nanoseconds: 300_000_000) // 300ms

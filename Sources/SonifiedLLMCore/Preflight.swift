@@ -59,7 +59,7 @@ public enum Preflight {
             let opts = GenerateOptions(maxTokens: 24)
             var lastMetrics: LLMMetrics? = nil
             let stream = engine.generate(prompt: "Hello from preflight.", options: opts)
-            for await ev in stream {
+            for try await ev in stream {
                 if case .metrics(let m) = ev { lastMetrics = m }
             }
             if lastMetrics == nil {

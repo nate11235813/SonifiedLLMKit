@@ -43,11 +43,11 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
         }
     }
 
-    func generate(prompt: String, options: GenerateOptions) -> AsyncStream<LLMEvent> {
-        AsyncStream { continuation in
+    func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error> {
+        AsyncThrowingStream { continuation in
             guard let h = self.stateQueue.sync(execute: { self.handle }), self.isLoaded else {
-                continuation.yield(.done)
-                continuation.finish(); return
+                continuation.finish(throwing: LLMError.notLoaded)
+                return
             }
             self.stateQueue.sync { self.isCancelledFlag = false }
             var cOpts = llm_gen_opts_t(
@@ -58,7 +58,7 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                 seed:            Int32(options.seed ?? 0)
             )
             // Box the continuation for the C callback
-            final class Box { let cont: AsyncStream<LLMEvent>.Continuation; init(_ c: AsyncStream<LLMEvent>.Continuation){ cont = c } }
+            final class Box { let cont: AsyncThrowingStream<LLMEvent, Error>.Continuation; init(_ c: AsyncThrowingStream<LLMEvent, Error>.Continuation){ cont = c } }
             let box = Unmanaged.passRetained(Box(continuation))
             let ctx = UnsafeMutableRawPointer(box.toOpaque())
             // Non-capturing C callback
@@ -71,11 +71,11 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
             }
             self.currentTask = Task.detached { [weak self] in
                 guard let self else { return }
-                prompt.withCString { cstr in
-                    _ = llm_eval(h, cstr, &cOpts, cb, ctx)
+                let evalRc: Int32 = prompt.withCString { cstr in
+                    llm_eval(h, cstr, &cOpts, cb, ctx)
                 }
                 var s = llm_stats_t(ttfb_ms: 0, tok_per_sec: 0, total_ms: 0, peak_rss_mb: 0, success: 0)
-                _ = llm_stats(h, &s)
+                let statsRc = llm_stats(h, &s)
                 let m = LLMMetrics(
                     chip: "unknown",
                     ramGB: 0,
@@ -89,8 +89,13 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                 )
                 self.stateQueue.sync { self._stats = m }
                 continuation.yield(.metrics(m))
-                continuation.yield(.done)
-                continuation.finish()
+                if evalRc != 0 || statsRc != 0 {
+                    let code = evalRc != 0 ? Int(evalRc) : Int(statsRc)
+                    continuation.finish(throwing: LLMError.runtimeFailure(code: code))
+                } else {
+                    continuation.yield(.done)
+                    continuation.finish()
+                }
                 // release the box
                 box.release()
             }
