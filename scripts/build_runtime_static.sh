@@ -65,7 +65,7 @@ cmake --build "$BUILD_DIR/arm64" --config Release
 # Create per-arch unified static lib for verification
 echo "==> Preparing arm64 unified static lib for verification"
 mkdir -p "$BUILD_DIR/arm64"
-"$CLANG" -arch arm64 -isysroot "$(xcrun --sdk macosx --show-sdk-path)" -mmacosx-version-min="$DEPLOYMENT_TARGET" -I "$HEADERS" -std=c11 -O2 \
+"$CLANG" -arch arm64 -isysroot "$(xcrun --sdk macosx --show-sdk-path)" -mmacosx-version-min="$DEPLOYMENT_TARGET" -I "$HEADERS" -I "vendor/llama.cpp/include" -I "vendor/llama.cpp/ggml/include" -std=c11 -O2 \
   -c RuntimeShim/src/sonified_llama_stub.c -o "$BUILD_DIR/arm64/sonified_llama_stub.o"
 "$LIBTOOL" -static -o "$BUILD_DIR/arm64/libsonified_llama.a" \
   "$BUILD_DIR/arm64/sonified_llama_stub.o" \
@@ -119,7 +119,7 @@ cmake --build "$BUILD_DIR/x86_64" --config Release
 # Create per-arch unified static lib for verification
 echo "==> Preparing x86_64 unified static lib for verification"
 mkdir -p "$BUILD_DIR/x86_64"
-"$CLANG" -arch x86_64 -isysroot "$(xcrun --sdk macosx --show-sdk-path)" -mmacosx-version-min="$DEPLOYMENT_TARGET" -I "$HEADERS" -std=c11 -O2 \
+"$CLANG" -arch x86_64 -isysroot "$(xcrun --sdk macosx --show-sdk-path)" -mmacosx-version-min="$DEPLOYMENT_TARGET" -I "$HEADERS" -I "vendor/llama.cpp/include" -I "vendor/llama.cpp/ggml/include" -std=c11 -O2 \
   -c RuntimeShim/src/sonified_llama_stub.c -o "$BUILD_DIR/x86_64/sonified_llama_stub.o"
 "$LIBTOOL" -static -o "$BUILD_DIR/x86_64/libsonified_llama.a" \
   "$BUILD_DIR/x86_64/sonified_llama_stub.o" \

@@ -45,7 +45,7 @@ function compile_stub() {
   local out_o="$BUILD_DIR/$arch/sonified_llama_stub.o"
   mkdir -p "$BUILD_DIR/$arch"
   echo "==> Compiling shim stub ($arch)"
-  "$CLANG" -arch "$arch" -isysroot "$sysroot" -mmacosx-version-min=13.0 -I "$HEADERS" -std=c11 -O2 \
+  "$CLANG" -arch "$arch" -isysroot "$sysroot" -mmacosx-version-min=13.0 -I "$HEADERS" -I "vendor/llama.cpp/include" -I "vendor/llama.cpp/ggml/include" -std=c11 -O2 \
     -c RuntimeShim/src/sonified_llama_stub.c -o "$out_o"
 }
 
