@@ -44,7 +44,7 @@ final class MockLLMEngine: LLMEngine {
                 let base = "Local LLMs on macOS can stream tokens with low latency using Metal-accelerated runtimes."
                 let words = base.split(separator: " ").map(String.init)
 
-                continuation.yield(.metrics(LLMMetrics(ttfbMillis: ttfb)))
+                continuation.yield(.metrics(LLMMetrics(ttfbMs: ttfb)))
 
                 let tokenDelayNs: UInt64 = 40_000_000 // 25 tok/s
                 for w in words {
@@ -59,7 +59,7 @@ final class MockLLMEngine: LLMEngine {
                 let tps = tokensEmitted > 0 && total > ttfb ? Double(tokensEmitted) / (Double(total - ttfb) / 1000.0) : 0
 
                 // final metrics (success reflects cancellation)
-                let finalMetrics = LLMMetrics(ttfbMillis: ttfb, tokPerSec: tps, totalDurationMillis: total, success: !isCancelledFlag)
+                let finalMetrics = LLMMetrics(ttfbMs: ttfb, tokPerSec: tps, totalDurationMillis: total, success: !isCancelledFlag)
                 _stats = finalMetrics
                 continuation.yield(.metrics(finalMetrics))
                 continuation.yield(.done)

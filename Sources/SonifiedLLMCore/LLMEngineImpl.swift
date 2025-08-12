@@ -79,7 +79,7 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                         box.earlyMetricsSent = true
                         let now = DispatchTime.now().uptimeNanoseconds
                         let ttfbMs = Int((now &- box.startTimeNs) / 1_000_000)
-                        box.cont.yield(.metrics(LLMMetrics(ttfbMillis: ttfbMs)))
+                        box.cont.yield(.metrics(LLMMetrics(ttfbMs: ttfbMs)))
                     }
                     box.cont.yield(.token(String(cString: token)))
                 }
@@ -108,7 +108,7 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                         ramGB: 0,
                         quant: "Q4_K_M",
                         context: Int(cOpts.context_length),
-                        ttfbMillis: Int(s.ttfb_ms),
+                        ttfbMs: Int(s.ttfb_ms),
                         tokPerSec: Double(s.tok_per_sec),
                         totalDurationMillis: Int(s.total_ms),
                         peakRSSMB: Int(s.peak_rss_mb),
@@ -131,7 +131,7 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                         ramGB: 0,
                         quant: "Q4_K_M",
                         context: Int(cOpts.context_length),
-                        ttfbMillis: Int(s.ttfb_ms),
+                        ttfbMs: Int(s.ttfb_ms),
                         tokPerSec: Double(s.tok_per_sec),
                         totalDurationMillis: Int(s.total_ms),
                         peakRSSMB: Int(s.peak_rss_mb),

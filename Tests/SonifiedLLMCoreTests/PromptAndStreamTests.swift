@@ -47,7 +47,7 @@ final class SonifiedLLMCoreTests: XCTestCase {
         // final metrics must be immediately before done or earlier, but present before done
         XCTAssertTrue(metricsIndices.last! < sequence.count - 1)
         if let fm = finalMetrics {
-            XCTAssertGreaterThanOrEqual(fm.totalDurationMillis, fm.ttfbMillis)
+            XCTAssertGreaterThanOrEqual(fm.totalDurationMillis, fm.ttfbMs)
             XCTAssertTrue(fm.success)
         } else {
             XCTFail("No final metrics captured")

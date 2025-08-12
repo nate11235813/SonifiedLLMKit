@@ -61,7 +61,7 @@ public struct PreflightView: View {
             }
             if let m = smokeMetrics {
                 GroupBox("Smoke Metrics") {
-                    Text("TTFB: \(m.ttfbMillis) ms")
+                    Text("TTFB: \(m.ttfbMs) ms")
                     Text("tok/s: \(String(format: "%.2f", m.tokPerSec))")
                     Text("total: \(m.totalDurationMillis) ms")
                 }
@@ -101,7 +101,7 @@ public struct PreflightView: View {
                     switch ev {
                     case .token(let t): output.append(t)
                     case .metrics(let m):
-                        if !sawFirstMetrics { ttfb = m.ttfbMillis; sawFirstMetrics = true }
+                        if !sawFirstMetrics { ttfb = m.ttfbMs; sawFirstMetrics = true }
                         else { runFinalMetrics = m }
                     case .done: break
                     }

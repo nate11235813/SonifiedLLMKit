@@ -48,7 +48,9 @@ public struct LLMMetrics: Sendable, Equatable {
     public let macOSVersion: String
     public let quant: String
     public let context: Int
-    public let ttfbMillis: Int
+    /// Time-to-first-token latency in milliseconds
+    public let ttfbMs: Int
+    /// Completion tokens per second, excluding prefill/TTFB
     public let tokPerSec: Double
     public let totalDurationMillis: Int
     public let peakRSSMB: Int
@@ -59,7 +61,7 @@ public struct LLMMetrics: Sendable, Equatable {
                 macOSVersion: String = ProcessInfo.processInfo.operatingSystemVersionString,
                 quant: String = "Q4_K_M",
                 context: Int = 4096,
-                ttfbMillis: Int = 0,
+                ttfbMs: Int = 0,
                 tokPerSec: Double = 0,
                 totalDurationMillis: Int = 0,
                 peakRSSMB: Int = 0,
@@ -69,7 +71,7 @@ public struct LLMMetrics: Sendable, Equatable {
         self.macOSVersion = macOSVersion
         self.quant = quant
         self.context = context
-        self.ttfbMillis = ttfbMillis
+        self.ttfbMs = ttfbMs
         self.tokPerSec = tokPerSec
         self.totalDurationMillis = totalDurationMillis
         self.peakRSSMB = peakRSSMB

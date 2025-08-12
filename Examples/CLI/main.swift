@@ -27,7 +27,7 @@ struct App {
                 case .metrics(let m):
                     if !sawFirstMetrics {
                         sawFirstMetrics = true
-                        fputs(String(format: "TTFB: %d ms\n", m.ttfbMillis), stderr)
+                        fputs(String(format: "TTFB: %d ms\n", m.ttfbMs), stderr)
                     } else {
                         fputs(String(format: "tok/s: %.2f  total: %d ms  success: %@\n", m.tokPerSec, m.totalDurationMillis, m.success ? "true" : "false"), stderr)
                     }
