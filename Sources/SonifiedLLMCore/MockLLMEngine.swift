@@ -39,12 +39,13 @@ final class MockLLMEngine: LLMEngine {
 
                 let ttfb = Int((DispatchTime.now().uptimeNanoseconds - start) / 1_000_000)
                 var tokensEmitted = 0
+                let approximatePromptTokens = max(0, prompt.split { $0.isWhitespace || $0.isNewline }.count)
 
                 // Emit a canned response deterministically based on prompt hash.
                 let base = "Local LLMs on macOS can stream tokens with low latency using Metal-accelerated runtimes."
                 let words = base.split(separator: " ").map(String.init)
 
-                continuation.yield(.metrics(LLMMetrics(ttfbMs: ttfb)))
+                continuation.yield(.metrics(LLMMetrics(ttfbMs: ttfb, promptTokens: approximatePromptTokens, completionTokens: 0, totalTokens: approximatePromptTokens)))
 
                 let tokenDelayNs: UInt64 = 40_000_000 // 25 tok/s
                 for w in words {
@@ -59,7 +60,15 @@ final class MockLLMEngine: LLMEngine {
                 let tps = tokensEmitted > 0 && total > ttfb ? Double(tokensEmitted) / (Double(total - ttfb) / 1000.0) : 0
 
                 // final metrics (success reflects cancellation)
-                let finalMetrics = LLMMetrics(ttfbMs: ttfb, tokPerSec: tps, totalDurationMillis: total, success: !isCancelledFlag)
+                let finalMetrics = LLMMetrics(
+                    ttfbMs: ttfb,
+                    promptTokens: approximatePromptTokens,
+                    completionTokens: tokensEmitted,
+                    totalTokens: approximatePromptTokens + tokensEmitted,
+                    tokPerSec: tps,
+                    totalDurationMillis: total,
+                    success: !isCancelledFlag
+                )
                 _stats = finalMetrics
                 continuation.yield(.metrics(finalMetrics))
                 continuation.yield(.done)

@@ -44,7 +44,7 @@ public enum Preflight {
         guard metal, ramGB >= 16 else { return nil }
         // Simple defaults for now
         if ramGB >= 16 {
-            return LLMModelSpec(name: "gpt-oss-20b", quant: "Q4_K_M", context: 4096)
+            return LLMModelSpec(name: "gpt-oss-20b", quant: .q4_K_M, contextTokens: 4096)
         }
         return nil
     }
@@ -53,8 +53,8 @@ public enum Preflight {
         do {
             let appSupport = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
             _ = appSupport // just to ensure directory exists
-            let url = try await store.ensureAvailable(spec: spec)
-            try await engine.load(modelURL: url, spec: spec)
+            let location = try await store.ensureAvailable(spec: spec)
+            try await engine.load(modelURL: location.url, spec: spec)
             defer { Task { await engine.unload() } }
             let opts = GenerateOptions(maxTokens: 24)
             var lastMetrics: LLMMetrics? = nil

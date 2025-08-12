@@ -14,7 +14,7 @@ final class SonifiedLLMCoreTests: XCTestCase {
 
     func testMockEngineStreams() async throws {
         let engine = EngineFactory.makeDefaultEngine()
-        try await engine.load(modelURL: URL(fileURLWithPath: "/dev/null"), spec: .init(name: "gpt-oss-20b", quant: "Q4_K_M", context: 4096))
+        try await engine.load(modelURL: URL(fileURLWithPath: "/dev/null"), spec: .init(name: "gpt-oss-20b", quant: .q4_K_M, contextTokens: 4096))
         var tokens = [String]()
         let stream = engine.generate(prompt: "Test", options: .init(maxTokens: 8))
         for try await ev in stream {
@@ -28,7 +28,7 @@ final class SonifiedLLMCoreTests: XCTestCase {
 
     func testEventOrderingAndFinalMetrics() async throws {
         let engine = MockLLMEngine()
-        try await engine.load(modelURL: URL(fileURLWithPath: "/dev/null"), spec: .init(name: "gpt-oss-20b", quant: "Q4_K_M", context: 4096))
+        try await engine.load(modelURL: URL(fileURLWithPath: "/dev/null"), spec: .init(name: "gpt-oss-20b", quant: .q4_K_M, contextTokens: 4096))
         var sequence: [LLMEvent] = []
         var finalMetrics: LLMMetrics? = nil
         let stream = engine.generate(prompt: "Hello", options: .init(maxTokens: 10))
@@ -49,6 +49,7 @@ final class SonifiedLLMCoreTests: XCTestCase {
         if let fm = finalMetrics {
             XCTAssertGreaterThanOrEqual(fm.totalDurationMillis, fm.ttfbMs)
             XCTAssertTrue(fm.success)
+            XCTAssertEqual(fm.totalTokens, fm.promptTokens + fm.completionTokens)
         } else {
             XCTFail("No final metrics captured")
         }
@@ -71,7 +72,7 @@ final class SonifiedLLMCoreTests: XCTestCase {
 
     func testCancelMidStreamEmitsFinalMetricsThenDone() async throws {
         let engine = MockLLMEngine()
-        try await engine.load(modelURL: URL(fileURLWithPath: "/dev/null"), spec: .init(name: "gpt-oss-20b", quant: "Q4_K_M", context: 4096))
+        try await engine.load(modelURL: URL(fileURLWithPath: "/dev/null"), spec: .init(name: "gpt-oss-20b", quant: .q4_K_M, contextTokens: 4096))
         var events: [LLMEvent] = []
         let stream = engine.generate(prompt: "Hello world", options: .init(maxTokens: 128))
         do {
@@ -91,10 +92,42 @@ final class SonifiedLLMCoreTests: XCTestCase {
         guard events.count >= 2 else { return XCTFail("Too few events: \(events)") }
         if case .metrics(let m) = events[events.count - 2] {
             XCTAssertFalse(m.success)
+            XCTAssertEqual(m.totalTokens, m.promptTokens + m.completionTokens)
         } else {
             return XCTFail("Expected final metrics before done")
         }
         if case .done = events.last! { } else { XCTFail("Expected done last") }
+    }
+
+    func testCancelSLA_NoTokensAfter150msWindow() async throws {
+        let engine = MockLLMEngine()
+        try await engine.load(modelURL: URL(fileURLWithPath: "/dev/null"), spec: .init(name: "gpt-oss-20b", quant: .q4_K_M, contextTokens: 4096))
+        let stream = engine.generate(prompt: "Hello world", options: .init(maxTokens: 256))
+        var cancelTimeNs: UInt64 = 0
+        var tokenTimesAfterCancelNs: [UInt64] = []
+        var cancelled = false
+        do {
+            for try await ev in stream {
+                switch ev {
+                case .token:
+                    if cancelled {
+                        tokenTimesAfterCancelNs.append(DispatchTime.now().uptimeNanoseconds)
+                    } else {
+                        cancelTimeNs = DispatchTime.now().uptimeNanoseconds
+                        engine.cancelCurrent()
+                        cancelled = true
+                    }
+                case .metrics, .done:
+                    break
+                }
+            }
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+        await engine.unload()
+        // Allow small tolerance: 200ms
+        let violated = tokenTimesAfterCancelNs.contains(where: { ($0 &- cancelTimeNs) > 200_000_000 })
+        XCTAssertFalse(violated, "Tokens continued arriving after the 200ms window")
     }
 }
 
@@ -102,7 +135,7 @@ final class SonifiedLLMCoreTests: XCTestCase {
 final class SonifiedLLMCoreRuntimeFailureTests: XCTestCase {
     func testRuntimeEvalFailureThrowsNoDone() async throws {
         let engine = LLMEngineImpl()
-        try await engine.load(modelURL: URL(fileURLWithPath: "stub"), spec: .init(name: "stub", quant: "Q4_K_M", context: 128))
+        try await engine.load(modelURL: URL(fileURLWithPath: "stub"), spec: .init(name: "stub", quant: .q4_K_M, contextTokens: 128))
         var sawDone = false
         let stream = engine.generate(prompt: "CAUSE_EVAL_FAIL", options: .init(maxTokens: 1))
         do {
@@ -118,7 +151,7 @@ final class SonifiedLLMCoreRuntimeFailureTests: XCTestCase {
 
     func testRuntimeStatsFailureThrowsNoDone() async throws {
         let engine = LLMEngineImpl()
-        try await engine.load(modelURL: URL(fileURLWithPath: "stub"), spec: .init(name: "stub", quant: "Q4_K_M", context: 128))
+        try await engine.load(modelURL: URL(fileURLWithPath: "stub"), spec: .init(name: "stub", quant: .q4_K_M, contextTokens: 128))
         var sawDone = false
         let stream = engine.generate(prompt: "CAUSE_STATS_FAIL", options: .init(maxTokens: 1))
         do {

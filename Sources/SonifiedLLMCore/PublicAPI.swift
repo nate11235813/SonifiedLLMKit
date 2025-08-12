@@ -2,16 +2,37 @@ import Foundation
 
 // MARK: - Model & Options
 
+/// Model specification used for loading a local GGUF model.
+///
+/// Tokenizer is read from the GGUF model by default; only override if you know what you're doing.
+///
+/// Example:
+/// ```swift
+/// let spec = LLMModelSpec(
+///   name: "gpt-oss-20b",
+///   quant: .q4_K_M,
+///   contextTokens: 4096
+/// )
+/// ```
 public struct LLMModelSpec: Codable, Sendable {
-    public let name: String          // e.g., "gpt-oss-20b"
-    public let quant: String         // e.g., "Q4_K_M"
-    public let context: Int          // e.g., 4096
-    public let tokenizer: String?    // embedded in GGUF or external id
+    public enum Quantization: String, Codable, Sendable {
+        case q4_K_M
+        case q5_K_M
+        case q6_K
+        case q8_0
+        case fp16
+    }
 
-    public init(name: String, quant: String, context: Int, tokenizer: String? = nil) {
+    public let name: String          // e.g., "gpt-oss-20b"
+    public let quant: Quantization   // e.g., .q4_K_M
+    public let contextTokens: Int    // e.g., 4096
+    /// Tokenizer identifier when overriding model-embedded tokenizer. Usually leave nil.
+    public let tokenizer: String?
+
+    public init(name: String, quant: Quantization, contextTokens: Int, tokenizer: String? = nil) {
         self.name = name
         self.quant = quant
-        self.context = context
+        self.contextTokens = contextTokens
         self.tokenizer = tokenizer
     }
 }
@@ -26,6 +47,10 @@ public struct LLMModelSpec: Codable, Sendable {
 ///
 /// Note: The context window size ("contextTokens") is defined by the loaded model
 /// via `LLMModelSpec.context` and not configured here.
+/// Example:
+/// ```swift
+/// let opts = GenerateOptions(temperature: 0.7, topP: 0.9, maxTokens: 256, seed: 42)
+/// ```
 public struct GenerateOptions: Sendable {
     public var temperature: Float
     public var topP: Float
@@ -42,6 +67,14 @@ public struct GenerateOptions: Sendable {
 
 // MARK: - Metrics & Events
 
+/// Aggregate performance and accounting metrics for a single generation run.
+///
+/// Example:
+/// ```swift
+/// if case .metrics(let m) = event {
+///   print("TTFB: \(m.ttfbMs) ms, total tokens: \(m.totalTokens)")
+/// }
+/// ```
 public struct LLMMetrics: Sendable, Equatable {
     public let chip: String
     public let ramGB: Int
@@ -50,6 +83,12 @@ public struct LLMMetrics: Sendable, Equatable {
     public let context: Int
     /// Time-to-first-token latency in milliseconds
     public let ttfbMs: Int
+    /// Number of tokens consumed by the prompt/prefill phase
+    public let promptTokens: Int
+    /// Number of tokens produced in the completion/decoding phase
+    public let completionTokens: Int
+    /// Total tokens for the run (prompt + completion)
+    public let totalTokens: Int
     /// Completion tokens per second, excluding prefill/TTFB
     public let tokPerSec: Double
     public let totalDurationMillis: Int
@@ -62,6 +101,9 @@ public struct LLMMetrics: Sendable, Equatable {
                 quant: String = "Q4_K_M",
                 context: Int = 4096,
                 ttfbMs: Int = 0,
+                promptTokens: Int = 0,
+                completionTokens: Int = 0,
+                totalTokens: Int = 0,
                 tokPerSec: Double = 0,
                 totalDurationMillis: Int = 0,
                 peakRSSMB: Int = 0,
@@ -72,6 +114,9 @@ public struct LLMMetrics: Sendable, Equatable {
         self.quant = quant
         self.context = context
         self.ttfbMs = ttfbMs
+        self.promptTokens = promptTokens
+        self.completionTokens = completionTokens
+        self.totalTokens = totalTokens
         self.tokPerSec = tokPerSec
         self.totalDurationMillis = totalDurationMillis
         self.peakRSSMB = peakRSSMB
@@ -91,7 +136,19 @@ public struct LLMMetrics: Sendable, Equatable {
 /// - User cancellation MUST emit final `.metrics` (success=false) then `.done` (no throw).
 ///
 /// Timing:
-/// - Engines MUST stop producing `.token` within ~150 ms of `cancelCurrent()`.
+/// - Engines SHOULD stop producing `.token` within ≤150 ms of `cancelCurrent()`.
+///
+/// Example:
+/// ```swift
+/// let stream = engine.generate(prompt: "Hi", options: .init(maxTokens: 16))
+/// for try await ev in stream {
+///   switch ev {
+///   case .token(let t): print(t, terminator: "")
+///   case .metrics(let m): print("\\nTTFB: \(m.ttfbMs) ms, total: \(m.totalTokens)")
+///   case .done: print("\\nDone")
+///   }
+/// }
+/// ```
 public enum LLMEvent: Sendable, Equatable {
     case token(String)
     case metrics(LLMMetrics)
@@ -112,15 +169,56 @@ public protocol LLMEngine: AnyObject, Sendable {
     /// - `.done` exactly once on successful or cancelled completion.
     ///
     /// Errors mid-generation are delivered via `AsyncThrowingStream` throws — `.done` is never emitted when throwing.
-    /// Cancellation MUST stop token emission within ~150 ms and still emit a final `.metrics` (success=false) then `.done`.
+    /// Cancellation SHOULD stop token emission within ≤150 ms and MUST still emit a final `.metrics` (success=false) then `.done`.
+    ///
+    /// Example:
+    /// ```swift
+    /// let engine = EngineFactory.makeDefaultEngine()
+    /// try await engine.load(modelURL: modelURL, spec: spec)
+    /// let stream = engine.generate(prompt: "hello", options: .init(maxTokens: 32))
+    /// var seenToken = false
+    /// for try await ev in stream {
+    ///   switch ev {
+    ///   case .token:
+    ///     if !seenToken { engine.cancelCurrent(); seenToken = true }
+    ///   case .metrics(let m): print("final tokens: \(m.totalTokens)")
+    ///   case .done: break
+    ///   }
+    /// }
+    /// ```
     func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error>
     func cancelCurrent()
-    /// A snapshot of the last run's final `.metrics`. This is not live-updating.
+    /// Snapshot of the last run's final `.metrics` (not live). Matches the payload of the final `.metrics` event.
     var stats: LLMMetrics { get }
 }
 
 public protocol ModelStore: Sendable {
-    func ensureAvailable(spec: LLMModelSpec) async throws -> URL
+    /// Ensure the model described by `spec` is available locally.
+    /// Returns the file URL and provenance. UI should use `location.url` and may display `location.source`.
+    ///
+    /// Example:
+    /// ```swift
+    /// let store: ModelStore = FileModelStore()
+    /// let location = try await store.ensureAvailable(spec: spec)
+    /// switch location.source {
+    /// case .bundled: print("Using bundled model at", location.url.path)
+    /// case .downloaded: print("Using downloaded model at", location.url.path)
+    /// }
+    /// ```
+    func ensureAvailable(spec: LLMModelSpec) async throws -> ModelLocation
     func purge(spec: LLMModelSpec) throws
-    func diskUsage() throws -> Int64
+    /// Returns bytes; UI formats units.
+    func diskUsage() async -> Int64
+}
+
+/// Location of a model on disk and how it was obtained.
+public struct ModelLocation: Sendable {
+    public let url: URL
+    public let source: Source
+    public enum Source: String, Sendable { case bundled, downloaded }
+
+    public init(url: URL, source: Source) {
+        self.url = url
+        self.source = source
+    }
 }

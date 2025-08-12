@@ -28,7 +28,7 @@ public struct PreflightView: View {
             GroupBox("Recommendation") {
                 if let s = system {
                     if let spec = s.recommendedSpec {
-                        Text("Model: \(spec.name) / \(spec.quant) / ctx \(spec.context)")
+                        Text("Model: \(spec.name) / \(spec.quant.rawValue) / ctx \(spec.contextTokens)")
                     } else {
                         Text("No recommendation — see notes.")
                     }
@@ -57,6 +57,7 @@ public struct PreflightView: View {
                     Text("tok/s: \(String(format: "%.2f", m.tokPerSec))")
                     Text("total: \(m.totalDurationMillis) ms")
                     Text("success: \(m.success ? "true" : "false")")
+                    Text("tokens: \(m.totalTokens) (p: \(m.promptTokens) c: \(m.completionTokens))")
                 }
             }
             if let m = smokeMetrics {
@@ -91,9 +92,9 @@ public struct PreflightView: View {
             runFinalMetrics = nil
             let engine = EngineFactory.makeDefaultEngine()
             let store = FileModelStore()
-            let spec = LLMModelSpec(name: "gpt-oss-20b", quant: "Q4_K_M", context: 4096)
-            let url = try? await store.ensureAvailable(spec: spec)
-            try? await engine.load(modelURL: url ?? URL(fileURLWithPath: "/dev/null"), spec: spec)
+            let spec = LLMModelSpec(name: "gpt-oss-20b", quant: .q4_K_M, contextTokens: 4096)
+            let location = try? await store.ensureAvailable(spec: spec)
+            try? await engine.load(modelURL: location?.url ?? URL(fileURLWithPath: "/dev/null"), spec: spec)
             let stream = engine.generate(prompt: text, options: .init(maxTokens: 64))
             do {
                 var sawFirstMetrics = false

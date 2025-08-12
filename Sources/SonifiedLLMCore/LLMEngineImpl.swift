@@ -63,12 +63,16 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                 let cont: AsyncThrowingStream<LLMEvent, Error>.Continuation
                 var earlyMetricsSent: Bool = false
                 let startTimeNs: UInt64
-                init(_ c: AsyncThrowingStream<LLMEvent, Error>.Continuation, startTimeNs: UInt64) {
+                var completionTokens: Int = 0
+                let promptTokens: Int
+                init(_ c: AsyncThrowingStream<LLMEvent, Error>.Continuation, startTimeNs: UInt64, promptTokens: Int) {
                     self.cont = c
                     self.startTimeNs = startTimeNs
+                    self.promptTokens = promptTokens
                 }
             }
-            let box = Unmanaged.passRetained(Box(continuation, startTimeNs: startTimeNs))
+            let approxPromptTokens = max(0, prompt.split { $0.isWhitespace || $0.isNewline }.count)
+            let box = Unmanaged.passRetained(Box(continuation, startTimeNs: startTimeNs, promptTokens: approxPromptTokens))
             let ctx = UnsafeMutableRawPointer(box.toOpaque())
             // Non-capturing C callback
             let cb: @convention(c) (UnsafePointer<CChar>?, UnsafeMutableRawPointer?) -> Void = { token, ctx in
@@ -79,8 +83,9 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                         box.earlyMetricsSent = true
                         let now = DispatchTime.now().uptimeNanoseconds
                         let ttfbMs = Int((now &- box.startTimeNs) / 1_000_000)
-                        box.cont.yield(.metrics(LLMMetrics(ttfbMs: ttfbMs)))
+                        box.cont.yield(.metrics(LLMMetrics(ttfbMs: ttfbMs, promptTokens: box.promptTokens, completionTokens: 0, totalTokens: box.promptTokens)))
                     }
+                    box.completionTokens += 1
                     box.cont.yield(.token(String(cString: token)))
                 }
             }
@@ -103,12 +108,16 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                 #endif
                 let wasCancelled = self.stateQueue.sync { self.isCancelledFlag }
                 if wasCancelled {
+                    let b = Unmanaged<Box>.fromOpaque(ctx).takeUnretainedValue()
                     let m = LLMMetrics(
                         chip: "unknown",
                         ramGB: 0,
                         quant: "Q4_K_M",
                         context: Int(cOpts.context_length),
                         ttfbMs: Int(s.ttfb_ms),
+                        promptTokens: b.promptTokens,
+                        completionTokens: b.completionTokens,
+                        totalTokens: b.promptTokens + b.completionTokens,
                         tokPerSec: Double(s.tok_per_sec),
                         totalDurationMillis: Int(s.total_ms),
                         peakRSSMB: Int(s.peak_rss_mb),
@@ -126,12 +135,16 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                     let code = evalRc != 0 ? Int(evalRc) : Int(statsRc)
                     continuation.finish(throwing: LLMError.runtimeFailure(code: code))
                 } else {
+                    let b = Unmanaged<Box>.fromOpaque(ctx).takeUnretainedValue()
                     let m = LLMMetrics(
                         chip: "unknown",
                         ramGB: 0,
                         quant: "Q4_K_M",
                         context: Int(cOpts.context_length),
                         ttfbMs: Int(s.ttfb_ms),
+                        promptTokens: b.promptTokens,
+                        completionTokens: b.completionTokens,
+                        totalTokens: b.promptTokens + b.completionTokens,
                         tokPerSec: Double(s.tok_per_sec),
                         totalDurationMillis: Int(s.total_ms),
                         peakRSSMB: Int(s.peak_rss_mb),
