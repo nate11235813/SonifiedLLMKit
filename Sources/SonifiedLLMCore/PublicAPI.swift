@@ -16,23 +16,27 @@ public struct LLMModelSpec: Codable, Sendable {
     }
 }
 
-public enum ReasoningLevel: Sendable {
-    case low, medium, high
-}
-
+/// Options controlling text generation.
+///
+/// Supported knobs:
+/// - `temperature`: Softens or sharpens the distribution (higher = more random).
+/// - `topP`: Nucleus sampling threshold.
+/// - `maxTokens`: Upper bound on number of tokens to generate.
+/// - `seed`: Optional PRNG seed for reproducibility.
+///
+/// Note: The context window size ("contextTokens") is defined by the loaded model
+/// via `LLMModelSpec.context` and not configured here.
 public struct GenerateOptions: Sendable {
     public var temperature: Float
     public var topP: Float
     public var maxTokens: Int
     public var seed: Int32?
-    public var reasoning: ReasoningLevel
 
-    public init(temperature: Float = 0.2, topP: Float = 0.9, maxTokens: Int = 256, seed: Int32? = nil, reasoning: ReasoningLevel = .low) {
+    public init(temperature: Float = 0.2, topP: Float = 0.9, maxTokens: Int = 256, seed: Int32? = nil) {
         self.temperature = temperature
         self.topP = topP
         self.maxTokens = maxTokens
         self.seed = seed
-        self.reasoning = reasoning
     }
 }
 
