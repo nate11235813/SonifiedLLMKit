@@ -21,6 +21,28 @@ swift run CLI "Write one sentence about local LLMs on macOS."
 - Implement background downloads + SHA256 verification in `SonifiedLLMDownloader`.
 - Add DocC, App Store notes, and Troubleshooting.
 
+## API Contracts
+
+### Event Ordering
+All `LLMEngine` implementations follow this event sequence when streaming from `generate(...)`:
+
+1. **Optional early `.metrics`** exactly once when the first token is ready (TTFB).
+2. **Zero or more `.token(String)`** events streamed in order.
+3. **One final `.metrics`** event with totals for the run.
+4. **`.done` exactly once** on successful or cancelled completion.
+
+Errors:
+- Fatal errors finish the `AsyncThrowingStream` by throwing and **MUST NOT** emit `.done`.
+- User cancellation should complete cleanly with final `.metrics` then `.done` (no throw).
+
+### Cancellation SLA
+Calling `cancelCurrent()` SHOULD:
+- Stop new `.token` events within ≈150 ms.
+- Still emit a final `.metrics` (with `success=false`) then `.done`.
+- Avoid throwing unless cancellation caused a fatal error.
+
+These contracts are enforced in both `MockLLMEngine` and `LLMEngineImpl` and covered by unit tests.
+
 ## Submodules
 
 We vendor `llama.cpp` as a git submodule pinned to a specific commit for reproducible builds.
