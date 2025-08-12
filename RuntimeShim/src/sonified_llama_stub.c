@@ -3,6 +3,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdatomic.h>
+#include <time.h>
+#include <mach/mach.h>
+
+// lightweight timing + RSS helpers
+static inline double now_ms(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (double)ts.tv_sec * 1000.0 + (double)ts.tv_nsec / 1e6;
+}
+
+static inline size_t current_rss_bytes(void) {
+    task_vm_info_data_t info;
+    mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
+    if (task_info(mach_task_self(), TASK_VM_INFO, (task_info_t)&info, &count) != KERN_SUCCESS) return 0;
+    return (size_t)info.phys_footprint; // good proxy for resident set on macOS
+}
 
 // ---- helpers (no dependency on common/) ----
 static int detect_n_threads_default(void) {
@@ -51,7 +67,7 @@ typedef struct LLMContext {
     int n_ctx;
     int n_gpu_layers;
     // placeholders for future slices:
-    // struct llm_stats_t lastStats;
+    llm_stats_t lastStats;   // persisted after each eval
 } LLMContext;
 
 // Global backend refcount so we init/free llama backends once
@@ -105,6 +121,7 @@ llm_handle_t llm_init(const char* model_path) {
     h->ctx = ctx;
     h->n_ctx = n_ctx;
     h->n_gpu_layers = n_gpu_layers;
+    memset(&h->lastStats, 0, sizeof(h->lastStats));
     return (llm_handle_t)h;
 }
 
@@ -134,10 +151,20 @@ int llm_eval(llm_handle_t h,
     // configure threads
     llama_set_n_threads(st->ctx, n_threads, n_threads);
 
+    // ---- metrics instrumentation ----
+    double t_start = now_ms();
+    double t_first = 0.0;
+    size_t peak_rss = current_rss_bytes();
+    int prompt_token_count = 0;
+    int gen_tokens = 0;
+    bool canceled = false;
+
     // 1) tokenize
     llama_token * prompt_tokens = NULL;
     int n_prompt = tokenize_prompt(st->model, prompt_utf8, /*add_bos=*/true, &prompt_tokens);
     if (n_prompt < 0) return -2;
+    // record prompt token count
+    prompt_token_count = n_prompt;
 
     // 2) prefill (prompt)
     if (n_prompt > 0) {
@@ -147,6 +174,10 @@ int llm_eval(llm_handle_t h,
             return -3;
         }
     }
+    {
+        size_t rss = current_rss_bytes();
+        if (rss > peak_rss) peak_rss = rss;
+    }
 
     // 3) decode loop (greedy)
     const struct llama_vocab * vocab = llama_model_get_vocab(st->model);
@@ -154,7 +185,7 @@ int llm_eval(llm_handle_t h,
     char piece_buf[512];
 
     while (produced < max_tokens) {
-        if (atomic_load(&st->cancelFlag)) break; // cooperative cancel
+        if (atomic_load(&st->cancelFlag)) { canceled = true; break; } // cooperative cancel
 
         // pick next token
         llama_token tok = sample_greedy(st->ctx, st->model);
@@ -165,6 +196,7 @@ int llm_eval(llm_handle_t h,
         int n = (int)llama_token_to_piece(vocab, tok, piece_buf, (int32_t)sizeof(piece_buf) - 1, /*lstrip=*/0, /*special=*/true);
         if (n > 0 && n < (int)sizeof(piece_buf)) {
             piece_buf[n] = '\0';
+            if (t_first == 0.0) t_first = now_ms();
             cb(piece_buf, user_ctx);
         }
 
@@ -176,9 +208,30 @@ int llm_eval(llm_handle_t h,
         }
 
         produced += 1;
+        gen_tokens += 1;
+        if ((gen_tokens & 7) == 0) {
+            size_t r = current_rss_bytes();
+            if (r > peak_rss) peak_rss = r;
+        }
     }
 
     free(prompt_tokens);
+
+    // ---- finalize metrics ----
+    double t_end = now_ms();
+    double total_ms = t_end - t_start;
+    double ttfb_ms  = (gen_tokens > 0 && t_first > 0.0) ? (t_first - t_start) : 0.0;
+    double decode_ms = (gen_tokens > 0 && t_end > t_first) ? (t_end - t_first) : 0.0;
+    double tok_per_sec = (gen_tokens > 0 && decode_ms > 0.0) ? ((double)gen_tokens / (decode_ms / 1000.0)) : 0.0;
+
+    llm_stats_t s = {0};
+    s.ttfb_ms = (int)(ttfb_ms);
+    s.tok_per_sec = (float)tok_per_sec;
+    s.total_ms = (int)(total_ms);
+    s.peak_rss_mb = (int)((double)peak_rss / (1024.0 * 1024.0));
+    s.success = canceled ? 0 : 1;
+
+    st->lastStats = s; // persist snapshot for llm_stats
     return 0; // cancellation is not an error
 }
 
@@ -200,15 +253,9 @@ void llm_free(llm_handle_t h) {
 }
 
 int llm_stats(llm_handle_t h, llm_stats_t* out_stats) {
-    // NOTE: relies on LLMContext first field layout
-    LLMContext* st = (LLMContext*)h;
-    if (!out_stats) return -1;
-    if (st && st->force_stats_fail) return -1;
-    memset(out_stats, 0, sizeof(*out_stats));
-    out_stats->ttfb_ms = 10;
-    out_stats->tok_per_sec = 25.0;
-    out_stats->total_ms = 50;
-    out_stats->peak_rss_mb = 100;
-    out_stats->success = 1;
+    if (!h || !out_stats) return -1;
+    LLMContext* ctx = (LLMContext*)h;
+    if (ctx->force_stats_fail) return -1; // preserve existing test behavior
+    *out_stats = ctx->lastStats; // struct copy
     return 0;
 }
