@@ -52,16 +52,41 @@ public struct LLMModelSpec: Codable, Sendable {
 /// let opts = GenerateOptions(temperature: 0.7, topP: 0.9, maxTokens: 256, seed: 42)
 /// ```
 public struct GenerateOptions: Sendable {
-    public var temperature: Float
-    public var topP: Float
+    // Core knobs
     public var maxTokens: Int
-    public var seed: Int32?
+    public var temperature: Double
+    public var topP: Double
+    public var topK: Int
+    public var repeatPenalty: Double
+    public var seed: Int
+    public var greedy: Bool
 
-    public init(temperature: Float = 0.2, topP: Float = 0.9, maxTokens: Int = 256, seed: Int32? = nil) {
+    // New preferred initializer (with requested defaults)
+    public init(maxTokens: Int = 128,
+                temperature: Double = 0.7,
+                topP: Double = 0.95,
+                topK: Int = 40,
+                repeatPenalty: Double = 1.1,
+                seed: Int = -1,
+                greedy: Bool = false) {
+        self.maxTokens = maxTokens
         self.temperature = temperature
         self.topP = topP
-        self.maxTokens = maxTokens
+        self.topK = topK
+        self.repeatPenalty = repeatPenalty
         self.seed = seed
+        self.greedy = greedy
+    }
+
+    // Backwards-compatible initializer used in tests and older callers
+    public init(temperature: Float = 0.2, topP: Float = 0.9, maxTokens: Int = 256, seed: Int32? = nil) {
+        self.maxTokens = maxTokens
+        self.temperature = Double(temperature)
+        self.topP = Double(topP)
+        self.topK = 40
+        self.repeatPenalty = 1.1
+        self.seed = seed.map { Int($0) } ?? -1
+        self.greedy = false
     }
 }
 

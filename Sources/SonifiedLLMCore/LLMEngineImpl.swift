@@ -43,6 +43,19 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
         }
     }
 
+    private func makeCOpts(from opts: GenerateOptions) -> llm_gen_opts_t {
+        var c = llm_gen_opts_t()
+        // Keep context_length as a simple heuristic for metrics display;
+        // actual context window is determined at init time via env override.
+        c.context_length = Int32(opts.maxTokens + 512)
+        let t = opts.greedy ? 0.0 : opts.temperature
+        c.temperature = Float(t)
+        c.top_p = Float(opts.topP)
+        c.max_tokens = Int32(opts.maxTokens)
+        c.seed = Int32(opts.seed)
+        return c
+    }
+
     func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error> {
         AsyncThrowingStream { continuation in
             guard let h = self.stateQueue.sync(execute: { self.handle }), self.isLoaded else {
@@ -51,13 +64,7 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
             }
             self.stateQueue.sync { self.isCancelledFlag = false }
             let startTimeNs = DispatchTime.now().uptimeNanoseconds
-            var cOpts = llm_gen_opts_t(
-                context_length:  Int32(options.maxTokens + 512), // simple default window
-                temperature:     options.temperature,
-                top_p:           options.topP,
-                max_tokens:      Int32(options.maxTokens),
-                seed:            Int32(options.seed ?? 0)
-            )
+            var cOpts = self.makeCOpts(from: options)
             // Box the continuation for the C callback
             final class Box {
                 let cont: AsyncThrowingStream<LLMEvent, Error>.Continuation

@@ -6,6 +6,16 @@
 #include <time.h>
 #include <mach/mach.h>
 
+// honor context override via env var SONIFIED_CTX
+static int get_env_ctx_override(void) {
+    const char *s = getenv("SONIFIED_CTX");
+    if (!s || !*s) return 0;
+    long v = strtol(s, NULL, 10);
+    if (v < 64) v = 64;
+    if (v > 32768) v = 32768;
+    return (int) v;
+}
+
 // lightweight timing + RSS helpers
 static inline double now_ms(void) {
     struct timespec ts;
@@ -75,6 +85,21 @@ static _Atomic int g_backend_refs = 0;
 
 llm_handle_t llm_init(const char* model_path) {
     if (!model_path || model_path[0] == '\0') return NULL;
+    // Allow unit-tests to run without a real model by treating certain paths as stub
+    if (strcmp(model_path, "stub") == 0 || strcmp(model_path, "/dev/null") == 0) {
+        LLMContext* h = (LLMContext*)calloc(1, sizeof(LLMContext));
+        if (!h) return NULL;
+        h->force_stats_fail = 0;
+        h->model = NULL;
+        h->ctx = NULL;
+        h->n_gpu_layers = 0;
+        int n_ctx = 4096;
+        int ctx_override = get_env_ctx_override();
+        if (ctx_override > 0) n_ctx = ctx_override;
+        h->n_ctx = n_ctx;
+        memset(&h->lastStats, 0, sizeof(h->lastStats));
+        return (llm_handle_t)h;
+    }
 
     if (atomic_fetch_add(&g_backend_refs, 1) == 0) {
         // Initialize ggml backends (Metal/CPU/etc.)
@@ -99,6 +124,10 @@ llm_handle_t llm_init(const char* model_path) {
     // ----- context params (sequence length, seed, etc.) -----
     struct llama_context_params cparams = llama_context_default_params();
     int n_ctx = 4096; // default until options are added to public header
+    int ctx_override = get_env_ctx_override();
+    if (ctx_override > 0) {
+        n_ctx = ctx_override;
+    }
     cparams.n_ctx = n_ctx;
     // leave seed as default for now
 
@@ -134,6 +163,27 @@ int llm_eval(llm_handle_t h,
 
     LLMContext* st = (LLMContext*)h;
     atomic_store(&st->cancelFlag, false);
+
+    // Stub path: no real model loaded. Emit one token and succeed unless forced to fail.
+    if (st->model == NULL) {
+        st->force_stats_fail = 0;
+        if (prompt_utf8 && strcmp(prompt_utf8, "CAUSE_EVAL_FAIL") == 0) {
+            return -1;
+        }
+        if (prompt_utf8 && strcmp(prompt_utf8, "CAUSE_STATS_FAIL") == 0) {
+            st->force_stats_fail = 1;
+        }
+        const char * piece = "ok";
+        cb(piece, user_ctx);
+        llm_stats_t s = {0};
+        s.ttfb_ms = 1;
+        s.tok_per_sec = 100.0f;
+        s.total_ms = 1;
+        s.peak_rss_mb = 1;
+        s.success = 1;
+        st->lastStats = s;
+        return 0;
+    }
 
     // defaults (keep minimal for now)
     const int max_tokens = (opts && opts->max_tokens > 0) ? opts->max_tokens : 128;

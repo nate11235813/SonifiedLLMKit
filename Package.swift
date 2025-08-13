@@ -21,17 +21,21 @@ let package = Package(
         // ),
         .binaryTarget(
             name: "SonifiedLLMRuntime",
-            url: "https://github.com/<your-org>/<your-repo>/releases/download/<tag>/SonifiedLLMRuntime.xcframework.zip",
-            checksum: "48f6cd0fb8238cb97a21a413edd477e24fc2a80d9f62609f111af4cfbcbb7e10"
+            // url: "https://github.com/<your-org>/<your-repo>/releases/download/<tag>/SonifiedLLMRuntime.xcframework.zip",
+            // checksum: "48f6cd0fb8238cb97a21a413edd477e24fc2a80d9f62609f111af4cfbcbb7e10"
+            path: "dist/SonifiedLLMRuntime.xcframework"
         ),
         .target(
             name: "SonifiedLLMCore",
-            dependencies: ["SonifiedLLMRuntime"],
+            dependencies: [],
             path: "Sources/SonifiedLLMCore",
             linkerSettings: [
                 .linkedFramework("Accelerate"),
                 .linkedFramework("Metal"),
-                .linkedFramework("Foundation")
+                .linkedFramework("Foundation"),
+                // binary includes static C++ libs; link libc++ and c++abi explicitly
+                .linkedLibrary("c++"),
+                .linkedLibrary("c++abi")
             ]
         ),
         .target(
