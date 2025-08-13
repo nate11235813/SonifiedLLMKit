@@ -89,7 +89,10 @@ let package = Package(
         .testTarget(
             name: "HarmonyKitTests",
             dependencies: ["HarmonyKit", "SonifiedLLMCore"],
-            path: "Tests/HarmonyKitTests"
+            path: "Tests/HarmonyKitTests",
+            resources: [
+                .process("Goldens")
+            ]
         )
     ]
 )

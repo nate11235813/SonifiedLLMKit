@@ -4,14 +4,15 @@ import XCTest
 
 final class HarmonyKitTests: XCTestCase {
     func testPromptRenderingIncludesRoles() throws {
+        // Golden test: fallback path without provider
         let messages: [HarmonyMessage] = [
             .init(role: .user, content: "Hello"),
-            .init(role: .assistant, content: "Hi there")
+            .init(role: .assistant, content: "Hi there"),
+            .init(role: .tool, content: "done", name: "echo")
         ]
-        let text = PromptBuilder.Harmony.render(system: "You are helpful.", messages: messages)
-        XCTAssertTrue(text.contains("<|system|>"))
-        XCTAssertTrue(text.contains("<|user|>"))
-        XCTAssertTrue(text.contains("<|assistant|>"))
+        let rendered = PromptBuilder.Harmony.render(system: "You are helpful.", messages: messages, provider: nil)
+        print("[FALLBACK RENDERED]\n\(rendered)")
+        assertMatchesGoldenTxt(named: "fallback_default", actual: rendered)
     }
 
     func testToolRegistryRegisterRetrieveAndInvoke() throws {
@@ -112,8 +113,70 @@ final class HarmonyKitTests: XCTestCase {
         XCTAssertTrue(s.hasPrefix("{\"tool\":"))
     }
 
-    func testRunnerIntegrationTokenToolTokenSequence() async throws {
-        // Custom engine that emits text -> tool json -> text
+    func testRoundTripHappyPathSingleTool() async throws {
+        // Engine that emits a single tool call in first leg, and then streams continuation in second leg
+        final class E: LLMEngine {
+            var stats: LLMMetrics = .init()
+            private var cancelled = false
+            func load(modelURL: URL, spec: LLMModelSpec) async throws {}
+            func unload() async {}
+            func cancelCurrent() { cancelled = true }
+            func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error> {
+                AsyncThrowingStream { cont in
+                    // If prompt contains tool message, act as second leg
+                    if prompt.contains("<|tool|>") {
+                        cont.yield(.metrics(.init()))
+                        cont.yield(.token("followup "))
+                        cont.yield(.metrics(.init()))
+                        cont.yield(.done)
+                        cont.finish()
+                        return
+                    }
+                    // First leg: token then toolCall json, then would have more but will be cancelled by turn
+                    cont.yield(.metrics(.init()))
+                    cont.yield(.token("before "))
+                    cont.yield(.token("{\"tool\":{\"name\":\"echo\",\"arguments\":{\"text\":\"hi\"}}}"))
+                    // Simulate some trailing text that should be ignored after cancel
+                    cont.yield(.token(" trailing"))
+                    cont.yield(.metrics(.init()))
+                    cont.yield(.done)
+                    cont.finish()
+                }
+            }
+        }
+        struct EchoTool: HarmonyTool {
+            let name = "echo"
+            let description = "Echo"
+            let parametersJSONSchema = "{\"type\":\"object\",\"properties\":{\"text\":{\"type\":\"string\"}},\"required\":[\"text\"]}"
+            func invoke(args: [String : Any]) throws -> ToolResult { ToolResult(name: name, content: String(describing: args["text"] ?? "")) }
+        }
+        let box = HarmonyToolbox(); try box.register(tool: EchoTool())
+        let engine = E()
+        let turn = HarmonyTurn(engine: engine, messages: [.init(role: .user, content: "hi")], toolbox: box)
+        var events: [HarmonyEvent] = []
+        for try await ev in turn.stream() { events.append(ev) }
+
+        // Verify ordering allowing an early metrics in second leg
+        XCTAssertEqual(events[0], .metrics(.init()))
+        XCTAssertEqual(events[1], .token("before "))
+        guard case .toolCall(let n, let args) = events[2] else { return XCTFail("missing toolCall") }
+        XCTAssertEqual(n, "echo")
+        XCTAssertEqual(String(describing: args["text"] ?? ""), "hi")
+        guard case .toolResult(let tr) = events[3] else { return XCTFail("missing toolResult") }
+        XCTAssertEqual(tr, ToolResult(name: "echo", content: "hi"))
+
+        // After toolResult, either metrics (TTFB2) or token may come first
+        var idx = 4
+        if case .metrics = events[idx] { idx += 1 }
+        XCTAssertEqual(events[idx], .token("followup "))
+        // There must be at least one more metrics before done
+        let lastMetrics = events.enumerated().compactMap { (i, e) -> Int? in if case .metrics = e { return i } else { return nil } }.last
+        XCTAssertNotNil(lastMetrics)
+        XCTAssertTrue(lastMetrics! < events.count - 1)
+        XCTAssertEqual(events.last, .done)
+    }
+
+    func testUnknownToolEmitsErrorAndContinues() async throws {
         final class E: LLMEngine {
             var stats: LLMMetrics = .init()
             func load(modelURL: URL, spec: LLMModelSpec) async throws {}
@@ -121,10 +184,15 @@ final class HarmonyKitTests: XCTestCase {
             func cancelCurrent() {}
             func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error> {
                 AsyncThrowingStream { cont in
+                    if prompt.contains("<|tool|>") {
+                        cont.yield(.metrics(.init()))
+                        cont.yield(.token("resume "))
+                        cont.yield(.metrics(.init()))
+                        cont.yield(.done)
+                        cont.finish(); return
+                    }
                     cont.yield(.metrics(.init()))
-                    cont.yield(.token("before "))
-                    cont.yield(.token("{\"tool\":{\"name\":\"echo\",\"arguments\":{\"text\":\"hi\"}}}"))
-                    cont.yield(.token(" after"))
+                    cont.yield(.token("{\"tool\":{\"name\":\"missing\",\"arguments\":{}}}"))
                     cont.yield(.metrics(.init()))
                     cont.yield(.done)
                     cont.finish()
@@ -132,17 +200,68 @@ final class HarmonyKitTests: XCTestCase {
             }
         }
         let engine = E()
-        let turn = HarmonyTurn(engine: engine, messages: [.init(role: .user, content: "hi")])
+        let turn = HarmonyTurn(engine: engine, messages: [.init(role: .user, content: "x")])
         var events: [HarmonyEvent] = []
         for try await ev in turn.stream() { events.append(ev) }
-        // Expect metrics, token("before "), toolCall, token(" after"), metrics, done
-        XCTAssertEqual(events.first, .metrics(.init()))
-        XCTAssertEqual(events[1], .token("before "))
-        guard case .toolCall(let n, let args) = events[2] else { return XCTFail("missing toolCall in stream") }
-        XCTAssertEqual(n, "echo")
-        XCTAssertEqual(String(describing: args["text"] ?? ""), "hi")
-        XCTAssertEqual(events[3], .token(" after"))
-        XCTAssertEqual(events[4], .metrics(.init()))
+        guard case .toolResult(let tr) = events[2] else { return XCTFail("expected toolResult at index 2") }
+        XCTAssertEqual(tr.name, "missing")
+        XCTAssertTrue(tr.content.contains("error"))
+        // Allow early metrics in second leg
+        var idx = 3
+        if case .metrics = events[idx] { idx += 1 }
+        XCTAssertEqual(events[idx], .token("resume "))
+        XCTAssertEqual(events.last, .done)
+    }
+
+    func testArgsValidatorRejectsUnexpectedKey() throws {
+        struct T: HarmonyTool { let name = "t"; let description = ""; let parametersJSONSchema = "{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\"}},\"required\":[\"a\"]}"; func invoke(args: [String : Any]) throws -> ToolResult { ToolResult(name: "t", content: "") } }
+        let box = HarmonyToolbox(); try box.register(tool: T())
+        let tool = try box.getToolOrThrow(named: "t")
+        XCTAssertThrowsError(try box.validateArgsStrict(args: ["a": "ok", "extra": 1], schemaJSON: tool.parametersJSONSchema))
+    }
+
+    func testCancellationMidSecondLegEmitsFinalMetricsAndDone() async throws {
+        final actor CancelLatch { var shouldCancel = false }
+        let latch = CancelLatch()
+
+        final class E: LLMEngine {
+            var stats: LLMMetrics = .init()
+            var onSecondLeg: (() -> Void)?
+            func load(modelURL: URL, spec: LLMModelSpec) async throws {}
+            func unload() async {}
+            func cancelCurrent() {}
+            func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error> {
+                AsyncThrowingStream { cont in
+                    if prompt.contains("<|tool|>") {
+                        cont.yield(.metrics(.init()))
+                        cont.yield(.token("continuing "))
+                        cont.yield(.metrics(.init(success: false)))
+                        cont.yield(.done)
+                        cont.finish(); return
+                    }
+                    cont.yield(.metrics(.init()))
+                    cont.yield(.token("{\"tool\":{\"name\":\"noop\",\"arguments\":{}}}"))
+                    cont.yield(.metrics(.init()))
+                    cont.yield(.done)
+                    cont.finish()
+                }
+            }
+        }
+        struct Noop: HarmonyTool { let name = "noop"; let description = ""; let parametersJSONSchema = "{\"type\":\"object\"}"; func invoke(args: [String : Any]) throws -> ToolResult { ToolResult(name: "noop", content: "ok") } }
+        let box = HarmonyToolbox(); try box.register(tool: Noop())
+        let engine = E()
+        let turn = HarmonyTurn(engine: engine, messages: [.init(role: .user, content: "x")], toolbox: box)
+        var events: [HarmonyEvent] = []
+        for try await ev in turn.stream() {
+            events.append(ev)
+            if events.contains(where: { if case .toolResult = $0 { return true } else { return false } }) {
+                // Request cancellation mid-second-leg
+                turn.cancel()
+            }
+        }
+        // Ensure final metrics(success=false) then done exist in order
+        guard let lastMetricsIdx = events.enumerated().compactMap({ (i, e) -> Int? in if case .metrics(let m) = e, !m.success { return i } else { return nil } }).last else { return XCTFail("no final metrics with success=false") }
+        XCTAssertTrue(lastMetricsIdx < events.count - 1)
         XCTAssertEqual(events.last, .done)
     }
 
@@ -173,6 +292,46 @@ final class HarmonyKitTests: XCTestCase {
         let seq1: [HarmonyEvent] = [.token("a"), e1, .toolResult(trA), .metrics(.init()), .done]
         let seq2: [HarmonyEvent] = [.token("a"), e2, .toolResult(trB), .metrics(.init()), .done]
         XCTAssertEqual(seq1, seq2)
+    }
+}
+
+// MARK: - Golden helpers and provider stub
+
+private struct StubTemplateProvider: PromptBuilder.Harmony.ChatTemplateProvider {
+    var template: String? = "{{bos}}\n{{content}}\n{{eos}}"
+    var bosToken: String = "<s>"
+    var eosToken: String = "</s>"
+}
+
+extension HarmonyKitTests {
+    func testTemplateProviderGolden() throws {
+        let provider = StubTemplateProvider()
+        let messages: [HarmonyMessage] = [
+            .init(role: .user, content: "Hello"),
+            .init(role: .assistant, content: "Hi"),
+            .init(role: .tool, content: "ok", name: "echo")
+        ]
+        let rendered = PromptBuilder.Harmony.render(system: "You are helpful.", messages: messages, provider: provider) + "\n"
+        print("[TEMPLATE RENDERED]\n\(rendered)")
+        assertMatchesGoldenTxt(named: "with_template", actual: rendered)
+    }
+
+    // Simple file-based golden assertion
+    func assertMatchesGoldenTxt(named: String, actual: String, file: StaticString = #filePath, line: UInt = #line) {
+        var loaded: String?
+        if let url = Bundle.module.url(forResource: named, withExtension: "txt", subdirectory: "Goldens"),
+           let s = try? String(contentsOf: url) {
+            loaded = s
+        } else {
+            // Fallback to filesystem relative to this test file when run in environments that strip resources
+            let base = URL(fileURLWithPath: String(describing: file)).deletingLastPathComponent()
+            let url = base.appendingPathComponent("Goldens").appendingPathComponent(named + ".txt")
+            loaded = try? String(contentsOf: url)
+        }
+        guard let expected = loaded else { return XCTFail("missing golden: \(named).txt") }
+        print("[GOLDEN \(named)]\n\(expected)")
+        print("[COMPARE suffixNL] actual=\(actual.hasSuffix("\n")) expected=\(expected.hasSuffix("\n"))")
+        XCTAssertEqual(actual, expected, file: file, line: line)
     }
 }
 

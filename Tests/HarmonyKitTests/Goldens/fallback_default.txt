@@ -1,0 +1,9 @@
+<|system|>
+You are helpful.
+<|user|>
+Hello
+<|assistant|>
+Hi there
+<|tool|> echo
+done
+<|assistant|>
