@@ -13,7 +13,9 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
 
     func load(modelURL: URL, spec: LLMModelSpec) async throws {
         if isLoaded { return }
-        let h = modelURL.path.withCString { cstr -> UnsafeMutableRawPointer? in
+        // Allow special stub handle by name to route to C stub path
+        let pathOrStub = (modelURL.lastPathComponent == "stub" || modelURL.path == "stub") ? "stub" : modelURL.path
+        let h = pathOrStub.withCString { cstr -> UnsafeMutableRawPointer? in
             return llm_init(cstr)
         }
         guard let h else {

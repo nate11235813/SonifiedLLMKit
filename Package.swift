@@ -27,7 +27,7 @@ let package = Package(
         ),
         .target(
             name: "SonifiedLLMCore",
-            dependencies: [],
+            dependencies: ["SonifiedLLMRuntime"],
             path: "Sources/SonifiedLLMCore",
             linkerSettings: [
                 .linkedFramework("Accelerate"),
