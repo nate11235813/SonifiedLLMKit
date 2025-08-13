@@ -87,13 +87,27 @@ public final class HarmonyTurn: @unchecked Sendable {
         return AsyncThrowingStream { continuation in
             Task {
                 do {
+                    var detector = ToolCallDetector()
                     for try await ev in baseStream {
                         switch ev {
                         case .token(let t):
-                            continuation.yield(.token(t))
+                            let detected = detector.ingest(t)
+                            for d in detected {
+                                switch d {
+                                case .text(let s):
+                                    if !s.isEmpty { continuation.yield(.token(s)) }
+                                case .toolCall(let name, let args):
+                                    continuation.yield(.toolCall(name: name, args: args))
+                                }
+                            }
                         case .metrics(let m):
                             continuation.yield(.metrics(m))
                         case .done:
+                            // Flush any trailing buffered text as normal tokens
+                            let tail = detector.finish()
+                            for d in tail {
+                                if case .text(let s) = d, !s.isEmpty { continuation.yield(.token(s)) }
+                            }
                             continuation.yield(.done)
                         }
                     }

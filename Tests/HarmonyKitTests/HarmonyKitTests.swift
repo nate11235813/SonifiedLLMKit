@@ -65,6 +65,87 @@ final class HarmonyKitTests: XCTestCase {
         XCTAssertTrue(metricsIndices.last! < events.count - 1)
     }
 
+    func testToolCallDetectorHappyPathSplitTokens() {
+        var d = ToolCallDetector()
+        let input = [
+            "Hello {\"tool\":" , " {\"name\":\"echo\",\"arguments\":{" , "\"text\":\"hi\"}}}", " and more"
+        ]
+        var out: [DetectedEvent] = []
+        for t in input { out.append(contentsOf: d.ingest(t)) }
+        out.append(contentsOf: d.finish())
+
+        // Expect: text("Hello "), toolCall(name:echo,args:{text:hi}), text(" and more")
+        XCTAssertEqual(out.count, 3)
+        guard case .text(let a0) = out[0], a0 == "Hello " else { return XCTFail("bad text prefix") }
+        guard case .toolCall(let name, let args) = out[1] else { return XCTFail("missing toolCall") }
+        XCTAssertEqual(name, "echo")
+        XCTAssertEqual(String(describing: args["text"] ?? ""), "hi")
+        guard case .text(let a2) = out[2], a2 == " and more" else { return XCTFail("bad text suffix") }
+    }
+
+    func testToolCallDetectorNestedBraces() {
+        var d = ToolCallDetector()
+        let json = "{\"tool\":{\"name\":\"calc\",\"arguments\":{\"a\":{\"b\":[1,{\"c\":3}]}}}}"
+        let out = d.ingest(json) + d.finish()
+        XCTAssertEqual(out.count, 1)
+        guard case .toolCall(let name, let args) = out[0] else { return XCTFail("expected toolCall") }
+        XCTAssertEqual(name, "calc")
+        XCTAssertNotNil(args["a"]) // nested structure present
+    }
+
+    func testToolCallDetectorGarbageIncompleteJSON() {
+        var d = ToolCallDetector()
+        let outs = d.ingest("start {\"tool\": \"oops") + d.finish()
+        XCTAssertEqual(outs.count, 1)
+        guard case .text = outs[0] else { return XCTFail("should be text only") }
+    }
+
+    func testToolCallDetectorSizeCapFallback() {
+        var d = ToolCallDetector()
+        // Construct a very large unclosed object after the marker
+        let start = "{\"tool\":{\"name\":\"x\",\"arguments\":{"
+        let big = String(repeating: "x", count: 40_000)
+        let outs = d.ingest(start + big)
+        // Since cap is 32k, capture should be abandoned and emitted as text
+        XCTAssertEqual(outs.count, 1)
+        guard case .text(let s) = outs[0] else { return XCTFail("expected text fallback") }
+        XCTAssertTrue(s.hasPrefix("{\"tool\":"))
+    }
+
+    func testRunnerIntegrationTokenToolTokenSequence() async throws {
+        // Custom engine that emits text -> tool json -> text
+        final class E: LLMEngine {
+            var stats: LLMMetrics = .init()
+            func load(modelURL: URL, spec: LLMModelSpec) async throws {}
+            func unload() async {}
+            func cancelCurrent() {}
+            func generate(prompt: String, options: GenerateOptions) -> AsyncThrowingStream<LLMEvent, Error> {
+                AsyncThrowingStream { cont in
+                    cont.yield(.metrics(.init()))
+                    cont.yield(.token("before "))
+                    cont.yield(.token("{\"tool\":{\"name\":\"echo\",\"arguments\":{\"text\":\"hi\"}}}"))
+                    cont.yield(.token(" after"))
+                    cont.yield(.metrics(.init()))
+                    cont.yield(.done)
+                    cont.finish()
+                }
+            }
+        }
+        let engine = E()
+        let turn = HarmonyTurn(engine: engine, messages: [.init(role: .user, content: "hi")])
+        var events: [HarmonyEvent] = []
+        for try await ev in turn.stream() { events.append(ev) }
+        // Expect metrics, token("before "), toolCall, token(" after"), metrics, done
+        XCTAssertEqual(events.first, .metrics(.init()))
+        XCTAssertEqual(events[1], .token("before "))
+        guard case .toolCall(let n, let args) = events[2] else { return XCTFail("missing toolCall in stream") }
+        XCTAssertEqual(n, "echo")
+        XCTAssertEqual(String(describing: args["text"] ?? ""), "hi")
+        XCTAssertEqual(events[3], .token(" after"))
+        XCTAssertEqual(events[4], .metrics(.init()))
+        XCTAssertEqual(events.last, .done)
+    }
+
     func testToolSchemasExposeMetadata() throws {
         struct A: HarmonyTool { let name = "a"; let description = "da"; let parametersJSONSchema = "{\"type\":\"object\"}"; func invoke(args: [String : Any]) throws -> ToolResult { ToolResult(name: "a", content: "") } }
         struct B: HarmonyTool { let name = "b"; let description = "db"; let parametersJSONSchema = "{\"type\":\"object\"}"; func invoke(args: [String : Any]) throws -> ToolResult { ToolResult(name: "b", content: "") } }
