@@ -11,6 +11,7 @@ let package = Package(
         .library(name: "SonifiedLLMDownloader", targets: ["SonifiedLLMDownloader"]),
         .library(name: "SonifiedLLMUI", targets: ["SonifiedLLMUI"]),
         // You may later expose a unified product "SonifiedLLMKit" that depends on the three modules above.
+        .library(name: "SonifiedLLMRuntimeSupport", targets: ["SonifiedLLMRuntimeSupport"]),
         .executable(name: "CLI", targets: ["CLI"])
     ],
     targets: [
@@ -25,18 +26,24 @@ let package = Package(
             // checksum: "48f6cd0fb8238cb97a21a413edd477e24fc2a80d9f62609f111af4cfbcbb7e10"
             path: "dist/SonifiedLLMRuntime.xcframework"
         ),
+        // Wrapper target to carry required linker settings for the static runtime
         .target(
-            name: "SonifiedLLMCore",
+            name: "SonifiedLLMRuntimeSupport",
             dependencies: ["SonifiedLLMRuntime"],
-            path: "Sources/SonifiedLLMCore",
+            path: "Sources/SonifiedLLMRuntimeSupport",
             linkerSettings: [
                 .linkedFramework("Accelerate"),
                 .linkedFramework("Metal"),
-                .linkedFramework("Foundation"),
                 // binary includes static C++ libs; link libc++ and c++abi explicitly
                 .linkedLibrary("c++"),
                 .linkedLibrary("c++abi")
             ]
+        ),
+        .target(
+            name: "SonifiedLLMCore",
+            dependencies: ["SonifiedLLMRuntimeSupport"],
+            path: "Sources/SonifiedLLMCore",
+            linkerSettings: []
         ),
         .target(
             name: "SonifiedLLMDownloader",
