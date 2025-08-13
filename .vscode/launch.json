@@ -17,6 +17,24 @@
             "name": "Release CLI",
             "program": "${workspaceFolder:SonifiedLLMKit}/.build/release/CLI",
             "preLaunchTask": "swift: Build Release CLI"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:SonifiedLLMKit}",
+            "name": "Debug HarmonyCLI",
+            "program": "${workspaceFolder:SonifiedLLMKit}/.build/debug/HarmonyCLI",
+            "preLaunchTask": "swift: Build Debug HarmonyCLI"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:SonifiedLLMKit}",
+            "name": "Release HarmonyCLI",
+            "program": "${workspaceFolder:SonifiedLLMKit}/.build/release/HarmonyCLI",
+            "preLaunchTask": "swift: Build Release HarmonyCLI"
         }
     ]
 }

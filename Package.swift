@@ -10,6 +10,7 @@ let package = Package(
         .library(name: "SonifiedLLMCore", targets: ["SonifiedLLMCore"]),
         .library(name: "SonifiedLLMDownloader", targets: ["SonifiedLLMDownloader"]),
         .library(name: "SonifiedLLMUI", targets: ["SonifiedLLMUI"]),
+        .library(name: "HarmonyKit", targets: ["HarmonyKit"]),
         // You may later expose a unified product "SonifiedLLMKit" that depends on the three modules above.
         .library(name: "SonifiedLLMRuntimeSupport", targets: ["SonifiedLLMRuntimeSupport"]),
         .executable(name: "CLI", targets: ["CLI"])
@@ -55,10 +56,20 @@ let package = Package(
             dependencies: ["SonifiedLLMCore", "SonifiedLLMDownloader"],
             path: "Sources/SonifiedLLMUI"
         ),
+        .target(
+            name: "HarmonyKit",
+            dependencies: ["SonifiedLLMCore"],
+            path: "Sources/HarmonyKit"
+        ),
         .executableTarget(
             name: "CLI",
             dependencies: ["SonifiedLLMCore", "SonifiedLLMDownloader"],
             path: "Examples/CLI"
+        ),
+        .executableTarget(
+            name: "HarmonyCLI",
+            dependencies: ["HarmonyKit", "SonifiedLLMDownloader"],
+            path: "Examples/HarmonyCLI"
         ),
         .testTarget(
             name: "SonifiedLLMCoreTests",
@@ -74,6 +85,11 @@ let package = Package(
             name: "SonifiedLLMRuntimeLinkTests",
             dependencies: ["SonifiedLLMCore"],
             path: "Tests/SonifiedLLMRuntimeLinkTests"
+        ),
+        .testTarget(
+            name: "HarmonyKitTests",
+            dependencies: ["HarmonyKit", "SonifiedLLMCore"],
+            path: "Tests/HarmonyKitTests"
         )
     ]
 )
