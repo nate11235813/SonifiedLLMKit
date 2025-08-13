@@ -18,6 +18,20 @@ public extension PromptBuilder {
             var eosToken: String { get }
         }
 
+        /// Provider that fetches the template from an injected closure.
+        /// Keeps HarmonyKit decoupled from runtime internals.
+        public struct GGUFChatTemplateProvider: ChatTemplateProvider {
+            private let fetch: () -> String?
+            public let bosToken: String
+            public let eosToken: String
+            public init(fetchTemplate: @escaping () -> String?, bosToken: String = "<s>", eosToken: String = "</s>") {
+                self.fetch = fetchTemplate
+                self.bosToken = bosToken
+                self.eosToken = eosToken
+            }
+            public var template: String? { fetch() }
+        }
+
         /// Default chat template for Harmony orchestration.
         /// Preserves the base SDK's role tags and formatting.
         /// If a model chat template is available via `provider`, the conversation is wrapped using it.

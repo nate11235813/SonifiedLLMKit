@@ -36,7 +36,9 @@ struct HarmonyApp {
             defer { Task { await engine.unload() } }
 
             let messages = [HarmonyMessage(role: .user, content: userText)]
-            let turn = HarmonyTurn(engine: engine, messages: messages, options: opts)
+            // Build a provider that pulls the template from the engine if available
+            let provider = PromptBuilder.Harmony.GGUFChatTemplateProvider(fetchTemplate: { engineChatTemplate(engine) })
+            let turn = HarmonyTurn(engine: engine, messages: messages, options: opts, toolbox: nil, chatTemplateProvider: provider)
 
             var sawFirst = false
             for try await ev in turn.stream() {

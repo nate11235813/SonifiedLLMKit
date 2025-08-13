@@ -7,6 +7,7 @@
 #include <time.h>
 #include <mach/mach.h>
 #include <stdio.h>
+#include <dlfcn.h>
 
 // honor context override via env var SONIFIED_CTX
 static int get_env_ctx_override(void) {
@@ -348,4 +349,52 @@ int llm_stats(llm_handle_t h, llm_stats_t* out_stats) {
     if (ctx->force_stats_fail) return -1; // preserve existing test behavior
     *out_stats = ctx->lastStats; // struct copy
     return 0;
+}
+
+int llm_chat_template(llm_handle_t h, char* out_buf, int out_buf_len) {
+    if (!h || !out_buf || out_buf_len <= 0) return -1;
+    LLMContext* st = (LLMContext*)h;
+    // Stub path: deterministic tiny template for tests
+    if (st->model == NULL) {
+        const char* tmpl = "{{bos}}\n{{content}}\n{{eos}}";
+        int need = (int)strlen(tmpl);
+        if (out_buf_len <= need) need = out_buf_len - 1;
+        if (need < 0) return -1;
+        memcpy(out_buf, tmpl, (size_t)need);
+        out_buf[need] = '\0';
+        return need;
+    }
+
+    // Real model: attempt to get default chat template from llama.cpp via dynamic lookup (ABI-safe)
+    typedef const char *(*fn_chat_t)(const struct llama_model *, const char *);
+    const char* ct = NULL;
+    void* self = dlopen(NULL, RTLD_LAZY);
+    if (self != NULL) {
+        fn_chat_t fn = (fn_chat_t)dlsym(self, "llama_model_chat_template");
+        if (fn) { ct = fn(st->model, NULL); }
+        dlclose(self);
+    }
+    if (!ct || *ct == '\0') {
+        // As a fallback, try well-known meta keys
+        char buf[4096];
+        int32_t n = llama_model_meta_val_str(st->model, "tokenizer.chat_template", buf, sizeof(buf));
+        if (n < 0 || buf[0] == '\0') {
+            n = llama_model_meta_val_str(st->model, "chat_template", buf, sizeof(buf));
+        }
+        if (n < 0 || buf[0] == '\0') return -1; // not available
+        // Copy from buf
+        int need = (int)strlen(buf);
+        if (out_buf_len <= need) need = out_buf_len - 1;
+        if (need < 0) return -1;
+        memcpy(out_buf, buf, (size_t)need);
+        out_buf[need] = '\0';
+        return need;
+    }
+    // Copy from ct
+    int need = (int)strlen(ct);
+    if (out_buf_len <= need) need = out_buf_len - 1;
+    if (need < 0) return -1;
+    memcpy(out_buf, ct, (size_t)need);
+    out_buf[need] = '\0';
+    return need;
 }

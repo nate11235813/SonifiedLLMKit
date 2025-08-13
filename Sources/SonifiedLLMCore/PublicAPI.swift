@@ -217,6 +217,16 @@ public protocol LLMEngine: AnyObject, Sendable {
     var stats: LLMMetrics { get }
 }
 
+/// Returns the model's embedded chat template when available for this engine instance.
+/// - Note: This is a convenience shim that avoids leaking implementation types cross-module.
+///         It returns nil for engines that do not support fetching a template.
+public func engineChatTemplate(_ engine: LLMEngine) -> String? {
+    #if canImport(SonifiedLLMRuntime)
+    if let impl = engine as? LLMEngineImpl { return impl.chatTemplate() }
+    #endif
+    return nil
+}
+
 public protocol ModelStore: Sendable {
     /// Ensure the model described by `spec` is available locally.
     /// Returns the file URL and provenance. UI should use `location.url` and may display `location.source`.

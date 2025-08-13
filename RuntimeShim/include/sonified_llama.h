@@ -63,6 +63,12 @@ void llm_free(llm_handle_t h);
 // Retrieve the latest stats into out_stats. Returns 0 on success.
 int llm_stats(llm_handle_t h, llm_stats_t* out_stats);
 
+// Retrieve the model's embedded chat template (read-only).
+// Copies up to out_buf_len-1 bytes into out_buf and always NUL-terminates on success.
+// Returns the number of bytes written (excluding NUL) or -1 if unavailable or on error.
+// In stub mode, returns a small deterministic template suitable for tests.
+int llm_chat_template(llm_handle_t h, char* out_buf, int out_buf_len);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

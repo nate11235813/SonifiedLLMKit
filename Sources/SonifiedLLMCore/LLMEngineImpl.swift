@@ -1,6 +1,7 @@
 // This file intentionally only compiles when the binary runtime is available.
 #if canImport(SonifiedLLMRuntime)
 import Foundation
+import Darwin
 @preconcurrency import SonifiedLLMRuntime
 
 final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
@@ -10,6 +11,9 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
     private let stateQueue = DispatchQueue(label: "sonified.runtime.state")
     private var currentTask: Task<Void, Never>?
     private var isCancelledFlag: Bool = false
+    private var cachedChatTemplate: String?
+    private var hasFetchedChatTemplate: Bool = false
+    private var loadedFromStub: Bool = false
 
     func load(modelURL: URL, spec: LLMModelSpec) async throws {
         if isLoaded { return }
@@ -24,6 +28,10 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
         stateQueue.sync {
             self.handle = h
             self.isLoaded = true
+            self.loadedFromStub = (pathOrStub == "stub")
+            // Invalidate any previously cached template when a new model is loaded
+            self.cachedChatTemplate = nil
+            self.hasFetchedChatTemplate = false
         }
     }
 
@@ -32,6 +40,10 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
             defer {
                 self.handle = nil
                 self.isLoaded = false
+                // Also invalidate template cache on unload
+                self.cachedChatTemplate = nil
+                self.hasFetchedChatTemplate = false
+                self.loadedFromStub = false
             }
             return self.handle
         }
@@ -174,6 +186,48 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
 
     var stats: LLMMetrics {
         stateQueue.sync { _stats }
+    }
+
+    /// Returns the model's embedded chat template if available.
+    /// Cached after the first successful or unsuccessful lookup.
+    /// Thread-safe and non-throwing. Returns nil if not available.
+    func chatTemplate() -> String? {
+        // Fast path if already fetched
+        if let cached = stateQueue.sync(execute: { hasFetchedChatTemplate ? cachedChatTemplate : nil }) {
+            return cached
+        }
+        // Acquire handle safely
+        guard let h = stateQueue.sync(execute: { self.handle }), isLoaded else {
+            stateQueue.sync { self.hasFetchedChatTemplate = true; self.cachedChatTemplate = nil }
+            return nil
+        }
+        // Query C shim via dynamic lookup to avoid hard link-time dependency
+        typealias Fn = @convention(c) (UnsafeMutableRawPointer?, UnsafeMutablePointer<CChar>?, Int32) -> Int32
+        let wrote: Int32 = {
+            guard let handle = dlopen(nil, RTLD_LAZY) else { return -1 }
+            defer { dlclose(handle) }
+            guard let sym = dlsym(handle, "llm_chat_template") else { return -1 }
+            let fn = unsafeBitCast(sym, to: Fn.self)
+            var buffer = [CChar](repeating: 0, count: 8192)
+            let n = fn(h, &buffer, Int32(buffer.count))
+            if n >= 0 {
+                let s = String(cString: buffer)
+                stateQueue.sync {
+                    self.cachedChatTemplate = s
+                    self.hasFetchedChatTemplate = true
+                }
+                return n
+            }
+            return -1
+        }()
+        if wrote >= 0 { return stateQueue.sync { self.cachedChatTemplate } }
+        // Fallback: if running against stub runtime, return deterministic template
+        let fallback: String? = stateQueue.sync { self.loadedFromStub ? "{{bos}}\n{{content}}\n{{eos}}" : nil }
+        stateQueue.sync {
+            self.cachedChatTemplate = fallback
+            self.hasFetchedChatTemplate = true
+        }
+        return fallback
     }
 }
 #endif
