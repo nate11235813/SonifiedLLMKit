@@ -25,7 +25,7 @@ final class RuntimeLinkTests: XCTestCase {
         }
 
         // Stats
-        var s = llm_stats_t(ttfb_ms: 0, tok_per_sec: 0, total_ms: 0, peak_rss_mb: 0, success: 0)
+        var s = llm_stats_t()
         XCTAssertEqual(llm_stats(handle, &s), 0)
         XCTAssertTrue(called)
 

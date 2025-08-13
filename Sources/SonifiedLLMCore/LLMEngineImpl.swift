@@ -78,7 +78,9 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                     self.promptTokens = promptTokens
                 }
             }
-            let approxPromptTokens = max(0, prompt.split { $0.isWhitespace || $0.isNewline }.count)
+            // Accurate prompt token count is provided by runtime stats after eval.
+            // For early metrics at TTFB, report 0 and update in final metrics.
+            let approxPromptTokens = 0
             let box = Unmanaged.passRetained(Box(continuation, startTimeNs: startTimeNs, promptTokens: approxPromptTokens))
             let ctx = UnsafeMutableRawPointer(box.toOpaque())
             // Non-capturing C callback
@@ -108,7 +110,7 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                 let evalRc: Int32 = prompt.withCString { cstr in
                     llm_eval(h, cstr, &cOpts, cb, ctx)
                 }
-                var s = llm_stats_t(ttfb_ms: 0, tok_per_sec: 0, total_ms: 0, peak_rss_mb: 0, success: 0)
+                var s = llm_stats_t()
                 var statsRc = llm_stats(h, &s)
                 #if DEBUG
                 if prompt == "CAUSE_STATS_FAIL" { statsRc = -1 }
@@ -122,9 +124,9 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                         quant: "Q4_K_M",
                         context: Int(cOpts.context_length),
                         ttfbMs: Int(s.ttfb_ms),
-                        promptTokens: b.promptTokens,
-                        completionTokens: b.completionTokens,
-                        totalTokens: b.promptTokens + b.completionTokens,
+                        promptTokens: Int(s.prompt_tokens),
+                        completionTokens: Int(s.completion_tokens),
+                        totalTokens: Int(s.total_tokens),
                         tokPerSec: Double(s.tok_per_sec),
                         totalDurationMillis: Int(s.total_ms),
                         peakRSSMB: Int(s.peak_rss_mb),
@@ -149,9 +151,9 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
                         quant: "Q4_K_M",
                         context: Int(cOpts.context_length),
                         ttfbMs: Int(s.ttfb_ms),
-                        promptTokens: b.promptTokens,
-                        completionTokens: b.completionTokens,
-                        totalTokens: b.promptTokens + b.completionTokens,
+                        promptTokens: Int(s.prompt_tokens),
+                        completionTokens: Int(s.completion_tokens),
+                        totalTokens: Int(s.total_tokens),
                         tokPerSec: Double(s.tok_per_sec),
                         totalDurationMillis: Int(s.total_ms),
                         peakRSSMB: Int(s.peak_rss_mb),

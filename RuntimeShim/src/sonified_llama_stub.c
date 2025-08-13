@@ -2,6 +2,7 @@
 #include "llama.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <stdatomic.h>
 #include <time.h>
 #include <mach/mach.h>
@@ -35,18 +36,19 @@ static int detect_n_threads_default(void) {
     return 4;
 }
 
-// two-pass tokenize; add BOS/EOS by default if model config allows
+// two-pass tokenize; follow model BOS policy, parse special tokens
 static int tokenize_prompt(struct llama_model * model, const char * prompt, bool add_bos /*unused*/, llama_token ** out) {
     if (!out) return -1;
     if (!prompt) prompt = "";
     const struct llama_vocab * vocab = llama_model_get_vocab(model);
+    const bool model_wants_bos = llama_vocab_get_add_bos(vocab);
     const int32_t text_len = (int32_t)strlen(prompt);
-    int32_t need = llama_tokenize(vocab, prompt, text_len, NULL, 0, /*add_special=*/true, /*parse_special=*/true);
+    int32_t need = llama_tokenize(vocab, prompt, text_len, NULL, 0, /*add_special=*/model_wants_bos, /*parse_special=*/true);
     if (need < 0) need = -need; // API returns negative of required size when buffer is NULL
     if (need <= 0) { *out = NULL; return 0; }
     llama_token * buf = (llama_token *)malloc(sizeof(llama_token) * (size_t)need);
     if (!buf) { *out = NULL; return -1; }
-    int32_t n = llama_tokenize(vocab, prompt, text_len, buf, need, /*add_special=*/true, /*parse_special=*/true);
+    int32_t n = llama_tokenize(vocab, prompt, text_len, buf, need, /*add_special=*/model_wants_bos, /*parse_special=*/true);
     if (n < 0) { free(buf); *out = NULL; return -1; }
     *out = buf;
     return (int)n;
@@ -175,12 +177,15 @@ int llm_eval(llm_handle_t h,
         }
         const char * piece = "ok";
         cb(piece, user_ctx);
-        llm_stats_t s = {0};
+    llm_stats_t s = {0};
         s.ttfb_ms = 1;
         s.tok_per_sec = 100.0f;
         s.total_ms = 1;
         s.peak_rss_mb = 1;
         s.success = 1;
+    s.prompt_tokens = 0;
+    s.completion_tokens = 1;
+    s.total_tokens = 1;
         st->lastStats = s;
         return 0;
     }
@@ -280,6 +285,9 @@ int llm_eval(llm_handle_t h,
     s.total_ms = (int)(total_ms);
     s.peak_rss_mb = (int)((double)peak_rss / (1024.0 * 1024.0));
     s.success = canceled ? 0 : 1;
+    s.prompt_tokens = prompt_token_count;
+    s.completion_tokens = gen_tokens;
+    s.total_tokens = prompt_token_count + gen_tokens;
 
     st->lastStats = s; // persist snapshot for llm_stats
     return 0; // cancellation is not an error

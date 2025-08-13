@@ -34,6 +34,10 @@ typedef struct llm_stats_t {
     int   total_ms;       // total generation duration in milliseconds
     int   peak_rss_mb;    // peak resident set size in MB
     int   success;        // 1 on success, 0 on failure
+    // Token accounting
+    int   prompt_tokens;      // tokens consumed by prompt/prefill
+    int   completion_tokens;  // tokens generated in completion
+    int   total_tokens;       // prompt + completion
 } llm_stats_t;
 
 // Initialize a runtime instance for the given model path.
