@@ -42,11 +42,15 @@ public struct FileModelStore: ModelStore {
     public func diskUsage() async -> Int64 {
         let fm = FileManager.default
         let appSupport = (try? fm.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)) ?? fm.temporaryDirectory
-        let modelsDir = appSupport.appendingPathComponent("Models")
-        let enumerator = fm.enumerator(at: modelsDir, includingPropertiesForKeys: [.fileSizeKey], options: [], errorHandler: nil)
+        let modelsDir = appSupport.appendingPathComponent("Models", isDirectory: true)
+        guard let enumerator = fm.enumerator(at: modelsDir, includingPropertiesForKeys: [.isRegularFileKey, .fileSizeKey], options: [], errorHandler: nil) else {
+            return 0
+        }
         var total: Int64 = 0
-        for case let url as URL in (enumerator ?? FileManager.DirectoryEnumerator()) {
-            if let values = try? url.resourceValues(forKeys: [.fileSizeKey]), let size = values.fileSize {
+        while let next = enumerator.nextObject() as? URL {
+            if let values = try? next.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey]),
+               values.isRegularFile == true,
+               let size = values.fileSize {
                 total += Int64(size)
             }
         }
