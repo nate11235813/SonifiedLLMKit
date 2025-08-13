@@ -91,6 +91,9 @@ struct HarmonyApp {
                     case .toolResult(let tr):
                         let metaJSON = compactJSONString(tr.metadata ?? [:]) ?? "{}"
                         print("\n[TOOL RESULT] \(tr.name) content=\(tr.content) meta=\(metaJSON)")
+                        if tr.name == "fileInfo", let err = tr.metadata?["error"] as? String, err == "escape" {
+                            fputs("[warn] fileInfo: input path escapes allowedRoot (\(allowedRoot.path)); rejecting.\n", stderr)
+                        }
                     case .done:
                         if let m = lastFinalMetrics {
                             print(String(format: "\nSUMMARY ttfb=%dms tok/s=%.2f total_ms=%d tokens=p:%d c:%d t:%d", m.ttfbMs, m.tokPerSec, m.totalDurationMillis, m.promptTokens, m.completionTokens, m.totalTokens))

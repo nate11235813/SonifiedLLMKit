@@ -23,6 +23,10 @@ public enum HarmonyEvent: Equatable { // @unchecked Sendable due to [String: Any
     case toolResult(ToolResult)
     case done
 
+    /// Semantics:
+    /// - The FIRST `.metrics` emitted in a turn corresponds to TTFB (time-to-first-token).
+    /// - A FINAL `.metrics` is emitted at the end with totals (tok/s, duration, token counts, success flag).
+    /// These semantics mirror `LLMEvent` from `SonifiedLLMCore` for parity with the CLI checklist.
     public static func == (lhs: HarmonyEvent, rhs: HarmonyEvent) -> Bool {
         switch (lhs, rhs) {
         case (.token(let a), .token(let b)):
