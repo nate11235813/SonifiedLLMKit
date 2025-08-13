@@ -6,6 +6,7 @@
 #include <stdatomic.h>
 #include <time.h>
 #include <mach/mach.h>
+#include <stdio.h>
 
 // honor context override via env var SONIFIED_CTX
 static int get_env_ctx_override(void) {
@@ -86,7 +87,10 @@ typedef struct LLMContext {
 static _Atomic int g_backend_refs = 0;
 
 llm_handle_t llm_init(const char* model_path) {
-    if (!model_path || model_path[0] == '\0') return NULL;
+    if (!model_path || model_path[0] == '\0') {
+        fprintf(stderr, "[sonified_llama] llm_init: empty model path\n");
+        return NULL;
+    }
     // Allow unit-tests to run without a real model by treating certain paths as stub
     if (strcmp(model_path, "stub") == 0 || strcmp(model_path, "/dev/null") == 0) {
         LLMContext* h = (LLMContext*)calloc(1, sizeof(LLMContext));
@@ -119,6 +123,7 @@ llm_handle_t llm_init(const char* model_path) {
 
     struct llama_model* model = llama_load_model_from_file(model_path, mparams);
     if (!model) {
+        fprintf(stderr, "[sonified_llama] llm_init: failed to load model at '%s' (insufficient memory or missing file)\n", model_path);
         if (atomic_fetch_sub(&g_backend_refs, 1) == 1) llama_backend_free();
         return NULL;
     }
@@ -135,6 +140,7 @@ llm_handle_t llm_init(const char* model_path) {
 
     struct llama_context* ctx = llama_new_context_with_model(model, cparams);
     if (!ctx) {
+        fprintf(stderr, "[sonified_llama] llm_init: failed to create context (n_ctx=%d)\n", n_ctx);
         llama_free_model(model);
         if (atomic_fetch_sub(&g_backend_refs, 1) == 1) llama_backend_free();
         return NULL;
@@ -142,6 +148,7 @@ llm_handle_t llm_init(const char* model_path) {
 
     LLMContext* h = (LLMContext*)calloc(1, sizeof(LLMContext));
     if (!h) {
+        fprintf(stderr, "[sonified_llama] llm_init: out of memory allocating context\n");
         llama_free(ctx);
         llama_free_model(model);
         if (atomic_fetch_sub(&g_backend_refs, 1) == 1) llama_backend_free();
@@ -161,7 +168,10 @@ int llm_eval(llm_handle_t h,
              const llm_gen_opts_t* opts,
              llm_token_cb cb,
              void* user_ctx) {
-    if (!h || !cb) return -1;
+    if (!h || !cb) {
+        fprintf(stderr, "[sonified_llama] llm_eval: invalid arguments (handle/callback)\n");
+        return -1;
+    }
 
     LLMContext* st = (LLMContext*)h;
     atomic_store(&st->cancelFlag, false);
@@ -217,7 +227,27 @@ int llm_eval(llm_handle_t h,
     // 1) tokenize
     llama_token * prompt_tokens = NULL;
     int n_prompt = tokenize_prompt(st->model, prompt_utf8, /*add_bos=*/true, &prompt_tokens);
-    if (n_prompt < 0) return -2;
+    if (n_prompt < 0) {
+        fprintf(stderr, "[sonified_llama] llm_eval: prompt tokenization failed\n");
+        return -2;
+    }
+    // If the prompt is empty, succeed without generating tokens
+    if (n_prompt == 0) {
+        double t_end = now_ms();
+        size_t rss = current_rss_bytes();
+        if (rss > peak_rss) peak_rss = rss;
+        llm_stats_t s = (llm_stats_t){0};
+        s.ttfb_ms = 0;
+        s.tok_per_sec = 0.0f;
+        s.total_ms = (int)(t_end - t_start);
+        s.peak_rss_mb = (int)((double)peak_rss / (1024.0 * 1024.0));
+        s.success = 1;
+        s.prompt_tokens = 0;
+        s.completion_tokens = 0;
+        s.total_tokens = 0;
+        st->lastStats = s;
+        return 0;
+    }
     // record prompt token count
     prompt_token_count = n_prompt;
 
@@ -225,6 +255,7 @@ int llm_eval(llm_handle_t h,
     if (n_prompt > 0) {
         struct llama_batch batch = llama_batch_get_one(prompt_tokens, n_prompt);
         if (llama_decode(st->ctx, batch) != 0) {
+            fprintf(stderr, "[sonified_llama] llm_eval: llama_decode prefill failed\n");
             free(prompt_tokens);
             return -3;
         }
@@ -258,6 +289,7 @@ int llm_eval(llm_handle_t h,
         // feed back the token
         struct llama_batch step = llama_batch_get_one(&tok, 1);
         if (llama_decode(st->ctx, step) != 0) {
+            fprintf(stderr, "[sonified_llama] llm_eval: llama_decode step failed\n");
             free(prompt_tokens);
             return -4;
         }
