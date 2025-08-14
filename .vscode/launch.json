@@ -35,6 +35,24 @@
             "name": "Release HarmonyCLI",
             "program": "${workspaceFolder:SonifiedLLMKit}/.build/release/HarmonyCLI",
             "preLaunchTask": "swift: Build Release HarmonyCLI"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:SonifiedLLMKit}",
+            "name": "Debug ModelIndexGen",
+            "program": "${workspaceFolder:SonifiedLLMKit}/.build/debug/ModelIndexGen",
+            "preLaunchTask": "swift: Build Debug ModelIndexGen"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:SonifiedLLMKit}",
+            "name": "Release ModelIndexGen",
+            "program": "${workspaceFolder:SonifiedLLMKit}/.build/release/ModelIndexGen",
+            "preLaunchTask": "swift: Build Release ModelIndexGen"
         }
     ]
 }

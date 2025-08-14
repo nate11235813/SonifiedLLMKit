@@ -1,0 +1,10 @@
+{
+  "embedded" : true,
+  "models" : [
+    {
+      "name" : "gpt-oss-20b",
+      "path" : "Models/gpt-oss-20b/gpt-oss-20b-q4_K_M.gguf",
+      "quant" : "q4_K_M"
+    }
+  ]
+}

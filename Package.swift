@@ -13,7 +13,8 @@ let package = Package(
         .library(name: "HarmonyKit", targets: ["HarmonyKit"]),
         // You may later expose a unified product "SonifiedLLMKit" that depends on the three modules above.
         .library(name: "SonifiedLLMRuntimeSupport", targets: ["SonifiedLLMRuntimeSupport"]),
-        .executable(name: "CLI", targets: ["CLI"])
+        .executable(name: "CLI", targets: ["CLI"]),
+        .executable(name: "ModelIndexGen", targets: ["ModelIndexGen"])
     ],
     targets: [
         // Local dev (uncomment to use local build):
@@ -70,6 +71,11 @@ let package = Package(
             name: "HarmonyCLI",
             dependencies: ["HarmonyKit", "SonifiedLLMDownloader"],
             path: "Examples/HarmonyCLI"
+        ),
+        .executableTarget(
+            name: "ModelIndexGen",
+            dependencies: ["SonifiedLLMDownloader"],
+            path: "Examples/Tools/ModelIndexGen"
         ),
         .testTarget(
             name: "SonifiedLLMCoreTests",

@@ -1,5 +1,22 @@
 ## Harmony layer
 
+### CLI auto model selection
+
+Run the Harmony CLI with automatic bundled model selection (no downloads):
+
+```bash
+swift run HarmonyCLI --harmony --model auto --spec gpt-oss-20b:q4_K_M --input Examples/HarmonyCLI/Samples/sample.json
+```
+
+Notes:
+- `auto` uses bundled models only; downloads are disabled in this phase.
+- Pass `--spec <name>:<quant>` to declare the desired target; the selector will choose the closest bundled fallback if the exact one is unavailable for your device caps.
+- The CLI prints a single selection line before generation, e.g.
+
+```text
+[MODEL SELECTION] requested=gpt-oss-20b:q4_K_M caps=arm64/16GB chosen=gpt-oss-20b:q4_K_M source=bundled path=/.../gpt-oss-20b-q4_K_M.gguf
+```
+
 HarmonyKit is a thin orchestration layer on top of `SonifiedLLMCore` that:
 
 - streams tokens with early metrics and a final summary

@@ -12,6 +12,7 @@ struct HarmonyApp {
         var useHarmony = false
         var inputPath: String?
         var modelPath: String?
+        var modelSpecString: String?
         var positionals: [String] = []
         func popNext(_ i: inout Int) -> String? { guard i + 1 < args.count else { return nil }; i += 1; return args[i] }
         var i = 0
@@ -22,6 +23,7 @@ struct HarmonyApp {
             case "--harmony": useHarmony = true
             case "--input": inputPath = popNext(&i)
             case "--model": modelPath = popNext(&i)
+            case "--spec": modelSpecString = popNext(&i)
             default: positionals.append(a)
             }
             i += 1
@@ -38,12 +40,55 @@ struct HarmonyApp {
 
         let engine = EngineFactory.makeDefaultEngine()
         let store = FileModelStore()
-        let spec = LLMModelSpec(name: "gpt-oss-20b", quant: .q4_K_M, contextTokens: 4096)
+        // Default spec remains 20B Q4_K_M unless --spec provided
+        var spec = LLMModelSpec(name: "gpt-oss-20b", quant: .q4_K_M, contextTokens: 4096)
+        if let s = modelSpecString {
+            // Parse format "name:quant"; quant uses existing string enum rawValues
+            if let colon = s.firstIndex(of: ":") {
+                let name = String(s[..<colon])
+                let quantStr = String(s[s.index(after: colon)...])
+                if let q = LLMModelSpec.Quantization(rawValue: quantStr) {
+                    spec = LLMModelSpec(name: name, quant: q, contextTokens: spec.contextTokens)
+                } else {
+                    fputs("Invalid --spec quant: \(quantStr). Valid: q4_K_M,q5_K_M,q6_K,q8_0,fp16\n", stderr)
+                    exit(2)
+                }
+            } else {
+                fputs("Invalid --spec format. Use <name>:<quant> (e.g., gpt-oss-20b:q4_K_M)\n", stderr)
+                exit(2)
+            }
+        }
         do {
+            // Selection behavior:
+            // - If --model is "stub" or an explicit path: preserve existing behavior.
+            // - If --model is "auto": require --spec and use bundled-only selection with fallback.
+            // - If --model omitted: keep previous ensureAvailable behavior (bundled-first).
             let location: ModelLocation
             if let modelPath {
                 if modelPath == "stub" {
                     location = ModelLocation(url: URL(fileURLWithPath: "stub"), source: .bundled)
+                } else if modelPath == "auto" {
+                    guard let _ = modelSpecString else {
+                        fputs("--model auto requires --spec <name>:<quant>\n", stderr)
+                        exit(2)
+                    }
+                    let caps = DeviceCaps(ramGB: Preflight.ramInGB(), arch: Preflight.currentArch())
+                    do {
+                        let sel = try ModelAutoSelection.resolve(spec: spec, caps: caps, in: .main)
+                        let capsStr = "\(caps.arch)/\(caps.ramGB)GB"
+                        print("[MODEL SELECTION] requested=\(sel.requestedName):\(sel.requestedQuant) caps=\(capsStr) chosen=\(sel.chosenName):\(sel.chosenQuant) source=\(sel.source.rawValue) path=\(sel.url.path)")
+                        location = ModelLocation(url: sel.url, source: sel.source)
+                        // If the chosen differs in name/quant, reflect that in spec for logging/metrics
+                        if sel.chosenName != spec.name || sel.chosenQuant != spec.quant.rawValue {
+                            if let q = LLMModelSpec.Quantization(rawValue: sel.chosenQuant) {
+                                spec = LLMModelSpec(name: sel.chosenName, quant: q, contextTokens: spec.contextTokens)
+                            }
+                        }
+                    } catch {
+                        fputs("\(error.localizedDescription)\n", stderr)
+                        if let e = error as? LLMError, let rec = e.recoverySuggestion { fputs("\(rec)\n", stderr) }
+                        exit(1)
+                    }
                 } else {
                     location = ModelLocation(url: URL(fileURLWithPath: modelPath), source: .downloaded)
                 }
