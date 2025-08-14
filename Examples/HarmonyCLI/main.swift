@@ -47,10 +47,10 @@ struct HarmonyApp {
             if let colon = s.firstIndex(of: ":") {
                 let name = String(s[..<colon])
                 let quantStr = String(s[s.index(after: colon)...])
-                if let q = LLMModelSpec.Quantization(rawValue: quantStr) {
+                    if let q = LLMModelSpec.Quantization(rawValue: quantStr) {
                     spec = LLMModelSpec(name: name, quant: q, contextTokens: spec.contextTokens)
                 } else {
-                    fputs("Invalid --spec quant: \(quantStr). Valid: q4_K_M,q5_K_M,q6_K,q8_0,fp16\n", stderr)
+                    	fputs("Invalid --spec quant: \(quantStr). Valid: q4_K_M,q5_K_M,q6_K,q8_0,fp16,mxfp4\n", stderr)
                     exit(2)
                 }
             } else {

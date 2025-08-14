@@ -7,3 +7,11 @@ dist/
 
 # macOS metadata
 .DS_Store
+
+# Ignore large local model files
+Models/**/*.gguf
+Models/*.gguf
+**/*.gguf
+
+# Allow catalog index to be tracked
+!BundledModels/index.json

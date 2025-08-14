@@ -41,6 +41,23 @@ final class ModelSelectionTests: XCTestCase {
             XCTFail("Unexpected error: \(error)")
         }
     }
+
+    func testQuantParsingIncludesMXFP4() {
+        XCTAssertNotNil(LLMModelSpec.Quantization(rawValue: "mxfp4"))
+    }
+
+    func testChoosePicksMXFP4WhenAvailable() throws {
+        // Build a tiny catalog that includes mxfp4
+        let caps = DeviceCaps(ramGB: 32, arch: "arm64")
+        let spec = LLMModelSpec(name: "gpt-oss-20b", quant: .mxfp4, contextTokens: 4096)
+        let cat: [BundledCatalogEntry] = [
+            .init(name: "gpt-oss-20b", quant: "mxfp4", path: "Models/gpt-oss-20b/gpt-oss-20b-mxfp4.gguf", minRamGB: 16, arch: ["arm64"]) ,
+        ]
+        let chosen = BundledModelSelector.choose(spec: spec, catalog: cat, caps: caps)
+        XCTAssertNotNil(chosen)
+        XCTAssertEqual(chosen?.name, "gpt-oss-20b")
+        XCTAssertEqual(chosen?.quant, "mxfp4")
+    }
 }
 
 

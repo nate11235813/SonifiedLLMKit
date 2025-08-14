@@ -79,4 +79,6 @@ When running the CLI with `--model auto`, the app:
 - Attempts exact match of your requested `name` + `quant` (subject to caps).
 - Otherwise, chooses the best available fallback based on quant rank and device caps.
 
+Recognized quant strings include `q4_K_M`, `q4_0`, `q5_K_M`, `q6_K`, `q8_0`, `fp16`, and `mxfp4`.
+
 

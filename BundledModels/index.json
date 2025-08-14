@@ -1,18 +1,15 @@
 {
-  "embedded": false,
-  "models": [
-    { "name": "gpt-oss-20b", "quant": "q4_K_M", "path": "Models/gpt-oss-20b/gpt-oss-20b-q4_K_M.gguf", "minRamGB": 16, "arch": ["arm64"] },
-    { "name": "gpt-oss-7b",  "quant": "q4_K_M", "path": "Models/gpt-oss-7b/gpt-oss-7b-q4_K_M.gguf",  "minRamGB": 10, "arch": ["arm64"] }
-  ]
-}
-
-{
   "embedded" : true,
   "models" : [
     {
       "name" : "gpt-oss-20b",
       "path" : "Models/gpt-oss-20b/gpt-oss-20b-q4_K_M.gguf",
       "quant" : "q4_K_M"
+    },
+    {
+      "name" : "gpt-oss-20b",
+      "path" : "Models/gpt-oss-20b/gpt-oss-20b-mxfp4.gguf",
+      "quant" : "mxfp4"
     }
   ]
 }

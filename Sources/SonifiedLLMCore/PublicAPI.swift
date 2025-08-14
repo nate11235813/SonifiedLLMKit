@@ -21,6 +21,7 @@ public struct LLMModelSpec: Codable, Sendable {
         case q6_K
         case q8_0
         case fp16
+        case mxfp4
     }
 
     public let name: String          // e.g., "gpt-oss-20b"
@@ -295,6 +296,7 @@ public enum BundledModelSelector {
             "q5_K_M": 70,
             "q5_K": 68,
             "q4_K_M": 60,
+            "mxfp4": 60,
             "q4_K_S": 58,
             "q4_1": 55,
             "q4_0": 50,
@@ -353,6 +355,7 @@ public enum BundledModelSelector {
             "q5_K_M": 70,
             "q5_K": 68,
             "q4_K_M": 60,
+            "mxfp4": 60,
             "q4_K_S": 58,
             "q4_1": 55,
             "q4_0": 50,
