@@ -101,6 +101,8 @@ Note: models are bundled only (no download).
 Toggle Enable tools to allow offline tool use (time, math, file info).
 Tool events appear inline as [TOOL CALL] … and [TOOL RESULT] ….
 
+The status strip shows model selection/fallback, per-turn TTFB & throughput, and brief errors (tool validation, cancel, or load failures).
+
 ### Tools
 
 A tool is a deterministic, offline-safe capability:

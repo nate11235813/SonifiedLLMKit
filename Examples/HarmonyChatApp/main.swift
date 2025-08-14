@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(AppKit)
+import AppKit
+#endif
 import SonifiedLLMCore
 import HarmonyKit
 
@@ -24,12 +27,21 @@ final class ChatViewModel: ObservableObject {
     @Published var tokPerSec: Double? = nil
     @Published var toolsEnabled: Bool = false
     @Published var inlineEvents: [String] = []
+    @Published var bannerText: String? = nil
+    @Published var bannerVisible: Bool = false
+    @Published var bannerStyle: BannerStyle = .info
 
     private(set) var conversation = HarmonyConversation()
     private var engine: LLMEngine? = nil
     private var provider: PromptBuilder.Harmony.ChatTemplateProvider? = nil
     private(set) var toolbox: HarmonyToolbox? = nil
-    private let allowedRoot: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+    @Published private(set) var allowedRoot: URL = ChatViewModel.defaultAllowedRoot()
+    var allowedRootPath: String { allowedRoot.path }
+    private var lastSuccess: Bool? = nil
+    private var bannerTask: Task<Void, Never>? = nil
+    private var lastFinalMetrics: LLMMetrics? = nil
+
+    enum BannerStyle { case info, error }
 
     func connect() {
         Task { @MainActor in
@@ -58,8 +70,26 @@ final class ChatViewModel: ObservableObject {
                 // Reset conversation with current system prompt
                 self.conversation.reset(system: self.systemPrompt)
                 self.transcript = self.conversation.messages
+                // Show selection/fallback banner (info, auto-dismiss)
+                let chosenStr2 = "\(result.chosenSpec.name):\(result.chosenSpec.quant.rawValue)"
+                var text = "Selected \(chosenStr2) (bundled)"
+                if let fb = result.fallback {
+                    text += " • Fell back from \(fb.from) → \(fb.to) (reason: \(fb.reason.rawValue))"
+                }
+                showBanner(text: text, style: .info, autoDismiss: true)
             } catch {
                 print("Connect failed: \(error)")
+                // Model load failed (both attempts)
+                var reason = "unknown"
+                if let e = error as? LLMError {
+                    switch e {
+                    case .engineInitFailed(let r, _): reason = r.rawValue
+                    default: reason = e.localizedDescription
+                    }
+                } else {
+                    reason = String(describing: error)
+                }
+                showBanner(text: "Model load failed: \(reason)", style: .error, autoDismiss: false)
             }
         }
     }
@@ -74,6 +104,26 @@ final class ChatViewModel: ObservableObject {
         }
     }
 
+    func chooseAllowedRoot() {
+        #if canImport(AppKit)
+        let panel = NSOpenPanel()
+        panel.title = "Choose allowed folder"
+        panel.prompt = "Choose"
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.canCreateDirectories = true
+        panel.directoryURL = allowedRoot
+        if panel.runModal() == .OK, let url = panel.url {
+            allowedRoot = url
+            if toolsEnabled {
+                toolbox = HarmonyToolbox.demoTools(allowedRoot: allowedRoot)
+            }
+            showBanner(text: "FileInfoTool root: \(allowedRoot.path)", style: .info, autoDismiss: true)
+        }
+        #endif
+    }
+
     func send() {
         guard let engine else { return }
         let text = userText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -83,6 +133,8 @@ final class ChatViewModel: ObservableObject {
         ttfbMs = nil
         tokPerSec = nil
         isGenerating = true
+        lastSuccess = nil
+        lastFinalMetrics = nil
 
         inlineEvents.removeAll()
         let stream: AsyncThrowingStream<HarmonyEvent, Error> = {
@@ -98,6 +150,8 @@ final class ChatViewModel: ObservableObject {
                     case .metrics(let m):
                         if ttfbMs == nil { ttfbMs = m.ttfbMs }
                         tokPerSec = m.tokPerSec > 0 ? m.tokPerSec : tokPerSec
+                        lastSuccess = m.success
+                        lastFinalMetrics = m // final metrics will overwrite; ok to set each time
                     case .token(let t):
                         currentStreamText += t
                     case .toolCall(let name, let args):
@@ -106,15 +160,32 @@ final class ChatViewModel: ObservableObject {
                         let meta = r.metadata ?? [:]
                         let metaStr = meta.isEmpty ? "" : " " + compactJSON(meta)
                         inlineEvents.append("[TOOL RESULT] \(r.name): \(r.content)\(metaStr)")
+                        if meta["error"] != nil {
+                            showBanner(text: "Tool error: \(meta["error"]!)", style: .error, autoDismiss: true)
+                        }
                     case .done:
                         isGenerating = false
                         currentStreamText = ""
                         transcript = conversation.messages
+                        // Clear inline events on successful completion to avoid sticky chips; retain on cancel
+                        if lastSuccess == true { inlineEvents.removeAll() }
+                        // Show final metrics banner once
+                        if let m = lastFinalMetrics {
+                            if m.success {
+                                let ttfb = m.ttfbMs
+                                let rate = String(format: "%.1f", m.tokPerSec)
+                                let text = "TTFB: \(ttfb) ms • tok/s: \(rate) • tokens: \(m.promptTokens)/\(m.completionTokens)"
+                                showBanner(text: text, style: .info, autoDismiss: true)
+                            } else {
+                                showBanner(text: "Canceled.", style: .info, autoDismiss: true)
+                            }
+                        }
                     }
                 }
             } catch {
                 isGenerating = false
                 print("Stream error: \(error)")
+                showBanner(text: "Error: \(String(describing: error))", style: .error, autoDismiss: true)
             }
         }
         userText = ""
@@ -122,6 +193,41 @@ final class ChatViewModel: ObservableObject {
 
     func cancel() {
         engine?.cancelCurrent()
+    }
+
+    func clear() {
+        conversation.reset(system: systemPrompt)
+        transcript = conversation.messages
+        currentStreamText = ""
+        inlineEvents.removeAll()
+    }
+
+    private func showBanner(text: String, style: BannerStyle, autoDismiss: Bool) {
+        bannerTask?.cancel()
+        bannerText = text
+        bannerStyle = style
+        bannerVisible = true
+        if autoDismiss {
+            bannerTask = Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 7_000_000_000)
+                bannerVisible = false
+            }
+        }
+    }
+
+    func dismissBanner() {
+        bannerTask?.cancel()
+        bannerVisible = false
+    }
+
+    private static func defaultAllowedRoot() -> URL {
+        let fm = FileManager.default
+        if let docs = fm.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let dir = docs.appendingPathComponent("SonifiedLLMKit", isDirectory: true)
+            try? fm.createDirectory(at: dir, withIntermediateDirectories: true)
+            return dir
+        }
+        return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
     }
 }
 
@@ -147,8 +253,9 @@ struct HarmonyChatView: View {
             }
 
             // Middle: transcript
-            ScrollView {
-                VStack(alignment: .leading, spacing: 6) {
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 6) {
                     ForEach(Array(vm.transcript.enumerated()), id: \.offset) { _, msg in
                         HStack(alignment: .top, spacing: 6) {
                             Text(roleLabel(msg.role))
@@ -184,8 +291,16 @@ struct HarmonyChatView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
+                        Color.clear.frame(height: 1).id("bottom")
+                    }
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
+                .onChange(of: vm.currentStreamText) { _ in
+                    withAnimation { proxy.scrollTo("bottom", anchor: .bottom) }
+                }
+                .onChange(of: vm.transcript.count) { _ in
+                    withAnimation { proxy.scrollTo("bottom", anchor: .bottom) }
+                }
             }
 
             // Bottom: input + send/cancel
@@ -193,9 +308,10 @@ struct HarmonyChatView: View {
                 TextField("Type a message", text: $vm.userText, axis: .vertical)
                     .textFieldStyle(.roundedBorder)
                 Button("Send") { vm.send() }
-                    .disabled(vm.userText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(vm.userText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || vm.isGenerating)
                 Button("Cancel") { vm.cancel() }
                     .disabled(!vm.isGenerating)
+                Button("Clear") { vm.clear() }
             }
 
             // Status strip
@@ -207,13 +323,38 @@ struct HarmonyChatView: View {
             .font(.system(.caption, design: .monospaced))
             .foregroundColor(.secondary)
             // Tools toggle and note
-            Toggle("Enable tools", isOn: Binding(get: { vm.toolsEnabled }, set: { vm.setToolsEnabled($0) }))
-                .disabled(vm.isGenerating)
+            HStack(spacing: 12) {
+                Toggle("Enable tools", isOn: Binding(get: { vm.toolsEnabled }, set: { vm.setToolsEnabled($0) }))
+                    .disabled(vm.isGenerating)
+                Button("Choose folder…") { vm.chooseAllowedRoot() }
+                    .disabled(vm.isGenerating)
+            }
             if vm.toolsEnabled {
-                Text("FileInfoTool is constrained to the app's allowed root; no network or path escapes.")
+                Text("FileInfoTool is constrained to the allowed root (\(vm.allowedRootPath)); no network or path escapes.")
                     .font(.system(.caption, design: .monospaced))
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            // Status banner
+            if vm.bannerVisible, let text = vm.bannerText {
+                HStack(spacing: 8) {
+                    Image(systemName: vm.bannerStyle == .error ? "exclamationmark.triangle.fill" : "info.circle")
+                        .foregroundColor(vm.bannerStyle == .error ? .yellow : .blue)
+                    Text(text)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
+                    Spacer()
+                    Button(action: { vm.dismissBanner() }) {
+                        Image(systemName: "xmark")
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.secondary)
+                }
+                .padding(8)
+                .background(.thinMaterial)
+                .cornerRadius(6)
             }
         }
         .padding(12)
