@@ -49,6 +49,17 @@ public enum Preflight {
         return nil
     }
 
+    /// Returns the current process architecture string (e.g., "arm64" or "x86_64").
+    public static func currentArch() -> String {
+        #if arch(arm64)
+        return "arm64"
+        #elseif arch(x86_64)
+        return "x86_64"
+        #else
+        return "unknown"
+        #endif
+    }
+
     public static func runSmoke(engine: LLMEngine, store: ModelStore, spec: LLMModelSpec) async -> LLMMetrics? {
         do {
             let appSupport = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)

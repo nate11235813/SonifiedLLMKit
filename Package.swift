@@ -73,8 +73,11 @@ let package = Package(
         ),
         .testTarget(
             name: "SonifiedLLMCoreTests",
-            dependencies: ["SonifiedLLMCore"],
-            path: "Tests/SonifiedLLMCoreTests"
+            dependencies: ["SonifiedLLMCore", "SonifiedLLMDownloader"],
+            path: "Tests/SonifiedLLMCoreTests",
+            resources: [
+                .process("Resources")
+            ]
         ),
         .testTarget(
             name: "SonifiedLLMDownloaderTests",

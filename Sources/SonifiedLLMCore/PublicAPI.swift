@@ -257,3 +257,87 @@ public struct ModelLocation: Sendable {
         self.source = source
     }
 }
+
+// MARK: - Bundled Catalog Types
+
+/// Optional extended fields describing bundled entries. Backwards compatible with minimal index.json.
+public struct BundledCatalogEntry: Codable, Sendable, Equatable {
+    public let name: String
+    public let quant: String
+    public let path: String
+    public let minRamGB: Int?
+    public let arch: [String]?
+}
+
+public struct BundledCatalog: Codable, Sendable, Equatable {
+    public let embedded: Bool
+    public let models: [BundledCatalogEntry]
+}
+
+/// Device capabilities used to guide bundled selection.
+public struct DeviceCaps: Sendable, Equatable {
+    public let ramGB: Int
+    public let arch: String
+    public init(ramGB: Int, arch: String) { self.ramGB = ramGB; self.arch = arch }
+}
+
+/// Policy-based selector that chooses the best bundled fallback.
+public enum BundledModelSelector {
+    /// Choose best entry from catalog given the desired spec and device caps.
+    /// - Returns: The chosen entry or nil if nothing fits.
+    public static func choose(spec: LLMModelSpec, catalog: [BundledCatalogEntry], caps: DeviceCaps) -> BundledCatalogEntry? {
+        // Define quant ranking (higher is better). Known names from `LLMModelSpec.Quantization` plus common lower precisions.
+        let rank: [String: Int] = [
+            "fp16": 100,
+            "q8_0": 90,
+            "q6_K_M": 80, // alias support if present in catalog
+            "q6_K": 78,
+            "q5_K_M": 70,
+            "q5_K": 68,
+            "q4_K_M": 60,
+            "q4_K_S": 58,
+            "q4_1": 55,
+            "q4_0": 50,
+            "q3_K_M": 40,
+            "q3_K_S": 35,
+            "q3_0": 30
+        ]
+
+        func passesCaps(_ e: BundledCatalogEntry) -> Bool {
+            if let min = e.minRamGB, caps.ramGB < min { return false }
+            if let allowed = e.arch, !allowed.isEmpty, !allowed.contains(caps.arch) { return false }
+            return true
+        }
+
+        // Allow cross-name fallback only if the requested name exists in the catalog at all.
+        let hasRequestedName = catalog.contains(where: { $0.name == spec.name })
+
+        // 1) Exact match (must pass caps)
+        if let exact = catalog.first(where: { $0.name == spec.name && $0.quant == spec.quant.rawValue && passesCaps($0) }) {
+            return exact
+        }
+
+        // 2) Same-name best quant that passes caps. Prefer higher precision (higher rank).
+        let sameName = catalog.filter { $0.name == spec.name && passesCaps($0) }
+        let bestSameName = sameName.max { (a, b) -> Bool in
+            let ra = rank[a.quant] ?? 0
+            let rb = rank[b.quant] ?? 0
+            return ra < rb
+        }
+        if let bestSameName = bestSameName { return bestSameName }
+
+        // 3) If the requested name is known but not suitable, pick best across catalog that passes caps (e.g., 7B fallback for 20B)
+        if hasRequestedName {
+            let candidates = catalog.filter { passesCaps($0) }
+            let bestOverall = candidates.max { (a, b) -> Bool in
+                let ra = rank[a.quant] ?? 0
+                let rb = rank[b.quant] ?? 0
+                if a.name == spec.name && b.name != spec.name { return false }
+                if b.name == spec.name && a.name != spec.name { return true }
+                return ra < rb
+            }
+            return bestOverall
+        }
+        return nil
+    }
+}

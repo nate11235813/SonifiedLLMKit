@@ -24,7 +24,7 @@ public enum LLMError: LocalizedError {
     public var recoverySuggestion: String? {
         switch self {
         case .modelNotFound:
-            return "Download the model via ModelStore first."
+            return "This build requires a bundled model; ensure the GGUF is added to the app bundle."
         case .checksumMismatch:
             return "Delete and re-download the model."
         case .insufficientMemory:
@@ -39,4 +39,9 @@ public enum LLMError: LocalizedError {
             return "Call load(modelURL:spec:) before generating."
         }
     }
+}
+
+public extension LLMError {
+    /// Convenience to make intent explicit at call site.
+    func withBundledOnlyRecovery() -> LLMError { self }
 }
