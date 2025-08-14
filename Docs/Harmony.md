@@ -1,3 +1,15 @@
+### Resilient auto model selection
+
+When running with `--model auto`, the CLI resolves a bundled model per your device caps. If the runtime fails to initialize the chosen model (e.g., OOM or unsupported), it will retry once with the next best bundled variant and continue streaming.
+
+Smoke test with the stub runtime:
+
+```arduino
+CAUSE_INIT_FAIL=1 swift run HarmonyCLI --harmony --model auto --spec gpt-oss-20b:q4_K_M --input Examples/HarmonyCLI/Samples/sample.json
+```
+
+You should see a `[MODEL SELECTION]` line and, when a fallback occurs, an additional `[MODEL FALLBACK] reason=... from=... to=...` line before tokens stream.
+
 ## Harmony layer
 
 ### CLI auto model selection
@@ -75,6 +87,19 @@ for try await ev in turn.stream() {
   }
 }
 ```
+
+### Sample app
+
+```arduino
+swift run HarmonyChatApp
+# (Optional) with stub + forced fallback:
+SONIFIED_USE_STUB=1 CAUSE_INIT_FAIL=1 swift run HarmonyChatApp
+```
+
+Note: models are bundled only (no download).
+
+Toggle Enable tools to allow offline tool use (time, math, file info).
+Tool events appear inline as [TOOL CALL] … and [TOOL RESULT] ….
 
 ### Tools
 

@@ -53,6 +53,24 @@
             "name": "Release ModelIndexGen",
             "program": "${workspaceFolder:SonifiedLLMKit}/.build/release/ModelIndexGen",
             "preLaunchTask": "swift: Build Release ModelIndexGen"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:SonifiedLLMKit}",
+            "name": "Debug HarmonyChatApp",
+            "program": "${workspaceFolder:SonifiedLLMKit}/.build/debug/HarmonyChatApp",
+            "preLaunchTask": "swift: Build Debug HarmonyChatApp"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:SonifiedLLMKit}",
+            "name": "Release HarmonyChatApp",
+            "program": "${workspaceFolder:SonifiedLLMKit}/.build/release/HarmonyChatApp",
+            "preLaunchTask": "swift: Build Release HarmonyChatApp"
         }
     ]
 }

@@ -74,16 +74,16 @@ struct HarmonyApp {
                     }
                     let caps = DeviceCaps(ramGB: Preflight.ramInGB(), arch: Preflight.currentArch())
                     do {
-                        let sel = try ModelAutoSelection.resolve(spec: spec, caps: caps, in: .main)
                         let capsStr = "\(caps.arch)/\(caps.ramGB)GB"
-                        print("[MODEL SELECTION] requested=\(sel.requestedName):\(sel.requestedQuant) caps=\(capsStr) chosen=\(sel.chosenName):\(sel.chosenQuant) source=\(sel.source.rawValue) path=\(sel.url.path)")
-                        location = ModelLocation(url: sel.url, source: sel.source)
-                        // If the chosen differs in name/quant, reflect that in spec for logging/metrics
-                        if sel.chosenName != spec.name || sel.chosenQuant != spec.quant.rawValue {
-                            if let q = LLMModelSpec.Quantization(rawValue: sel.chosenQuant) {
-                                spec = LLMModelSpec(name: sel.chosenName, quant: q, contextTokens: spec.contextTokens)
-                            }
+                        // Use the resilient loader
+                        let engine = engine // same engine instance
+                        let result = try await ResilientModelLoader.loadBundled(engine: engine, requestedSpec: spec, caps: caps, bundle: .main, catalog: nil)
+                        print("[MODEL SELECTION] requested=\(spec.name):\(spec.quant.rawValue) caps=\(capsStr) chosen=\(result.chosenSpec.name):\(result.chosenSpec.quant.rawValue) source=bundled path=\(result.url.path)")
+                        if let fb = result.fallback {
+                            print("[MODEL FALLBACK] reason=\(fb.reason.rawValue) from=\(fb.from) to=\(fb.to)")
                         }
+                        location = ModelLocation(url: result.url, source: .bundled)
+                        spec = result.chosenSpec
                     } catch {
                         fputs("\(error.localizedDescription)\n", stderr)
                         if let e = error as? LLMError, let rec = e.recoverySuggestion { fputs("\(rec)\n", stderr) }
@@ -95,7 +95,10 @@ struct HarmonyApp {
             } else {
                 location = try await store.ensureAvailable(spec: spec)
             }
-            try await engine.load(modelURL: location.url, spec: spec)
+            // In auto mode above we already loaded via resilient loader. For other paths, load here.
+            if modelPath != "auto" {
+                try await engine.load(modelURL: location.url, spec: spec)
+            }
             defer { Task { await engine.unload() } }
 
             // Build provider to prefer GGUF chat template

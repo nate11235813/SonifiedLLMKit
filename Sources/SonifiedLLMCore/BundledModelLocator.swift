@@ -28,6 +28,10 @@ public enum BundledModelLocator {
     /// Attempt to locate a bundled model URL for the provided spec inside `bundle`.
     /// - Returns: URL if found, otherwise nil.
     public static func locate(spec: LLMModelSpec, in bundle: Bundle) -> URL? {
+        // Dev/test override: allow forcing stub runtime regardless of spec
+        if ProcessInfo.processInfo.environment["SONIFIED_USE_STUB"] == "1" {
+            return URL(fileURLWithPath: "stub")
+        }
         // 1) Try manifest if present
         var manifestData: Data? = nil
         if let manifestURL = bundle.url(forResource: "index", withExtension: "json", subdirectory: "BundledModels") {
@@ -90,6 +94,16 @@ public enum BundledModelLocator {
             return base
         }
 
+        // 3) Dev-time fallback: look for files relative to repository root when running from source
+        #if DEBUG
+        if let repo = devRepoRoot() {
+            let candidates = [
+                repo.appendingPathComponent("Models/\(spec.name)/\(spec.name)-\(quant).gguf"),
+                repo.appendingPathComponent("Models/\(spec.name)-\(quant).gguf")
+            ]
+            for u in candidates { if FileManager.default.fileExists(atPath: u.path) { return u } }
+        }
+        #endif
         return nil
     }
 
@@ -116,6 +130,10 @@ public enum BundledModelLocator {
     /// Attempt to locate a bundled model URL for provided name and quant (string form), without needing a typed `LLMModelSpec`.
     /// Useful when selecting a fallback from the catalog where the quant might not map to `LLMModelSpec.Quantization`.
     public static func locate(name: String, quant: String, in bundle: Bundle) -> URL? {
+        // Dev/test override: allow forcing stub runtime regardless of spec
+        if ProcessInfo.processInfo.environment["SONIFIED_USE_STUB"] == "1" {
+            return URL(fileURLWithPath: "stub")
+        }
         // 1) Try manifest if present
         var manifestData: Data? = nil
         if let manifestURL = bundle.url(forResource: "index", withExtension: "json", subdirectory: "BundledModels") {
@@ -160,12 +178,36 @@ public enum BundledModelLocator {
         if let base = bundle.resourceURL?.appendingPathComponent("\(name)-\(quant).gguf"),
            FileManager.default.fileExists(atPath: base.path) { return base }
 
+        // Dev-time fallback: repository-relative
+        #if DEBUG
+        if let repo = devRepoRoot() {
+            let candidates = [
+                repo.appendingPathComponent("Models/\(name)/\(name)-\(quant).gguf"),
+                repo.appendingPathComponent("Models/\(name)-\(quant).gguf")
+            ]
+            for u in candidates { if FileManager.default.fileExists(atPath: u.path) { return u } }
+        }
+        #endif
         return nil
     }
 
     private static func resolve(path: String, in bundle: Bundle) -> URL? {
         return resolvePath(path, in: bundle)
     }
+
+    #if DEBUG
+    private static func devRepoRoot() -> URL? {
+        // Dev-time helper to locate repo root from this file's path
+        let this = URL(fileURLWithPath: #file)
+        let repo = this
+            .deletingLastPathComponent() // BundledModelLocator.swift
+            .deletingLastPathComponent() // SonifiedLLMCore
+            .deletingLastPathComponent() // Sources
+        let modelsDir = repo.appendingPathComponent("Models", isDirectory: true)
+        if FileManager.default.fileExists(atPath: modelsDir.path) { return repo }
+        return nil
+    }
+    #endif
 }
 
 

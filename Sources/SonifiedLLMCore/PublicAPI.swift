@@ -340,4 +340,48 @@ public enum BundledModelSelector {
         }
         return nil
     }
+
+    /// Ordered candidate list to try for loading, starting from the best option.
+    /// Includes the requested spec (if present and passes caps), then other same-name quants by descending quality,
+    /// then cross-name fallbacks by descending quality. Duplicates are removed.
+    public static func orderedCandidates(spec: LLMModelSpec, catalog: [BundledCatalogEntry], caps: DeviceCaps) -> [BundledCatalogEntry] {
+        let rank: [String: Int] = [
+            "fp16": 100,
+            "q8_0": 90,
+            "q6_K_M": 80,
+            "q6_K": 78,
+            "q5_K_M": 70,
+            "q5_K": 68,
+            "q4_K_M": 60,
+            "q4_K_S": 58,
+            "q4_1": 55,
+            "q4_0": 50,
+            "q3_K_M": 40,
+            "q3_K_S": 35,
+            "q3_0": 30
+        ]
+        func passesCaps(_ e: BundledCatalogEntry) -> Bool {
+            if let min = e.minRamGB, caps.ramGB < min { return false }
+            if let allowed = e.arch, !allowed.isEmpty, !allowed.contains(caps.arch) { return false }
+            return true
+        }
+        var list: [BundledCatalogEntry] = []
+        // exact first
+        if let exact = catalog.first(where: { $0.name == spec.name && $0.quant == spec.quant.rawValue && passesCaps($0) }) {
+            list.append(exact)
+        }
+        // same-name others
+        let sameName = catalog.filter { $0.name == spec.name && passesCaps($0) }
+        let sameSorted = sameName.sorted { (a, b) -> Bool in
+            (rank[a.quant] ?? 0) > (rank[b.quant] ?? 0)
+        }
+        for e in sameSorted { if !list.contains(e) { list.append(e) } }
+        // cross-name fallbacks
+        let others = catalog.filter { $0.name != spec.name && passesCaps($0) }
+        let othersSorted = others.sorted { (a, b) -> Bool in
+            (rank[a.quant] ?? 0) > (rank[b.quant] ?? 0)
+        }
+        for e in othersSorted { if !list.contains(e) { list.append(e) } }
+        return list
+    }
 }

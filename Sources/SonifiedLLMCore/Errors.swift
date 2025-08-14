@@ -7,6 +7,12 @@ public enum LLMError: LocalizedError {
     case metalUnavailable
     case promptTooLong
     case runtimeFailure(code: Int)
+    public enum EngineInitFailureReason: String, Sendable {
+        case oom
+        case unsupported
+        case unknown
+    }
+    case engineInitFailed(reason: EngineInitFailureReason, message: String)
     case notLoaded
 
     public var errorDescription: String? {
@@ -17,6 +23,7 @@ public enum LLMError: LocalizedError {
         case .metalUnavailable: return "Metal driver/path unavailable."
         case .promptTooLong: return "Prompt exceeds context window."
         case .runtimeFailure(let code): return "Runtime failure (\(code))."
+        case .engineInitFailed(let reason, let message): return "Engine initialization failed (\(reason.rawValue)): \(message)"
         case .notLoaded: return "Engine is not loaded."
         }
     }
@@ -35,6 +42,12 @@ public enum LLMError: LocalizedError {
             return "Shorten the prompt, or use a lower context to fit memory."
         case .runtimeFailure:
             return "Retry, lower settings, or file a bug with logs."
+        case .engineInitFailed(let reason, _):
+            switch reason {
+            case .oom: return "Out of memory. Try a smaller bundled model or lower quant/context."
+            case .unsupported: return "This model is unsupported on this device. Try a smaller model or different quant."
+            case .unknown: return "Initialization failed. Try a different model or lower settings."
+            }
         case .notLoaded:
             return "Call load(modelURL:spec:) before generating."
         }

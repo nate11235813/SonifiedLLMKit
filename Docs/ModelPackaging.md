@@ -1,3 +1,17 @@
+## Auto fallback on engine init failure
+
+When using auto selection, the loader will attempt to initialize the requested bundled model. If runtime initialization fails (e.g., OOM or unsupported), it will automatically retry once with the next best bundled variant based on your device caps.
+
+Smoke test with the runtime stub:
+
+```arduino
+CAUSE_INIT_FAIL=1 swift run HarmonyCLI --harmony --model auto --spec gpt-oss-20b:q4_K_M --input Examples/HarmonyCLI/Samples/sample.json
+```
+
+Expected:
+- A `[MODEL FALLBACK]` line such as: `reason=oom from=gpt-oss-20b:q4_K_M to=gpt-oss-7b:q4_K_M`
+- Streaming tokens continue after selection.
+
 ### Packaging models with your app
 
 This project supports bundling GGUF models directly in your app bundle and discovering them automatically.

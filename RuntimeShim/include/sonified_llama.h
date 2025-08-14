@@ -45,6 +45,14 @@ typedef struct llm_stats_t {
 // TODO: Add additional parameters for tokenizer overrides, quantization hints, device selection, etc.
 llm_handle_t llm_init(const char* model_path /*, params TBD */);
 
+// Retrieve the last error code from the most recent API call on the current thread.
+// Returns 0 if no error was recorded.
+int llm_last_error_code(void);
+
+// Retrieve a human-readable message for the last error. The returned pointer is owned
+// by the library and valid until the next API call on the same thread.
+const char* llm_last_error_message(void);
+
 // Evaluate/generate from a prompt using the given options.
 // Returns 0 on success, non-zero on error.
 // Tokens are streamed through the provided callback.

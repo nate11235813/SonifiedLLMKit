@@ -23,7 +23,30 @@ final class LLMEngineImpl: LLMEngine, @unchecked Sendable {
             return llm_init(cstr)
         }
         guard let h else {
-            throw LLMError.runtimeFailure(code: -1)
+            // Map to typed init failure using last error from runtime when available (dynamic lookup)
+            typealias FnCode = @convention(c) () -> Int32
+            typealias FnMsg = @convention(c) () -> UnsafePointer<CChar>?
+            var code: Int32 = -1
+            var message: String = "unknown"
+            if let handle = dlopen(nil, RTLD_LAZY) {
+                defer { dlclose(handle) }
+                if let sym = dlsym(handle, "llm_last_error_code") {
+                    let fn = unsafeBitCast(sym, to: FnCode.self)
+                    code = fn()
+                }
+                if let sym = dlsym(handle, "llm_last_error_message") {
+                    let fn = unsafeBitCast(sym, to: FnMsg.self)
+                    if let c = fn() { message = String(cString: c) }
+                }
+            }
+            let reason: LLMError.EngineInitFailureReason = {
+                switch code {
+                case ENOMEM: return .oom
+                case EOPNOTSUPP, ENOTSUP: return .unsupported
+                default: return .unknown
+                }
+            }()
+            throw LLMError.engineInitFailed(reason: reason, message: message)
         }
         stateQueue.sync {
             self.handle = h

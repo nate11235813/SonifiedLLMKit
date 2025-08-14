@@ -8,6 +8,42 @@
 #include <mach/mach.h>
 #include <stdio.h>
 #include <dlfcn.h>
+// ---- simple thread-local last-error storage ----
+#if defined(__APPLE__)
+#include <pthread.h>
+static _Thread_local int g_last_err_code = 0;
+static _Thread_local char g_last_err_msg[256];
+static inline void set_last_error(int code, const char* msg) {
+    g_last_err_code = code;
+    if (msg && *msg) {
+        size_t n = strlen(msg);
+        if (n >= sizeof(g_last_err_msg)) n = sizeof(g_last_err_msg) - 1;
+        memcpy(g_last_err_msg, msg, n);
+        g_last_err_msg[n] = '\0';
+    } else {
+        g_last_err_msg[0] = '\0';
+    }
+}
+int llm_last_error_code(void) { return g_last_err_code; }
+const char* llm_last_error_message(void) { return g_last_err_msg; }
+#else
+static __thread int g_last_err_code = 0;
+static __thread char g_last_err_msg[256];
+static inline void set_last_error(int code, const char* msg) {
+    g_last_err_code = code;
+    if (msg && *msg) {
+        size_t n = strlen(msg);
+        if (n >= sizeof(g_last_err_msg)) n = sizeof(g_last_err_msg) - 1;
+        memcpy(g_last_err_msg, msg, n);
+        g_last_err_msg[n] = '\0';
+    } else {
+        g_last_err_msg[0] = '\0';
+    }
+}
+int llm_last_error_code(void) { return g_last_err_code; }
+const char* llm_last_error_message(void) { return g_last_err_msg; }
+#endif
+
 
 // honor context override via env var SONIFIED_CTX
 static int get_env_ctx_override(void) {
@@ -90,7 +126,18 @@ static _Atomic int g_backend_refs = 0;
 llm_handle_t llm_init(const char* model_path) {
     if (!model_path || model_path[0] == '\0') {
         fprintf(stderr, "[sonified_llama] llm_init: empty model path\n");
+        set_last_error(-2, "empty model path");
         return NULL;
+    }
+    // Deterministic failure for tests via env var
+    static _Atomic int g_fail_once_consumed = 0;
+    const char* fail_env = getenv("CAUSE_INIT_FAIL");
+    if (fail_env && strcmp(fail_env, "1") == 0) {
+        int was = atomic_exchange(&g_fail_once_consumed, 1);
+        if (was == 0) {
+            set_last_error(12 /*ENOMEM*/, "forced init failure: OOM (CAUSE_INIT_FAIL=1)");
+            return NULL;
+        }
     }
     // Allow unit-tests to run without a real model by treating certain paths as stub
     if (strcmp(model_path, "stub") == 0 || strcmp(model_path, "/dev/null") == 0) {
@@ -125,6 +172,7 @@ llm_handle_t llm_init(const char* model_path) {
     struct llama_model* model = llama_load_model_from_file(model_path, mparams);
     if (!model) {
         fprintf(stderr, "[sonified_llama] llm_init: failed to load model at '%s' (insufficient memory or missing file)\n", model_path);
+        set_last_error(12 /*ENOMEM*/, "failed to load model (likely OOM or missing file)");
         if (atomic_fetch_sub(&g_backend_refs, 1) == 1) llama_backend_free();
         return NULL;
     }
@@ -142,6 +190,7 @@ llm_handle_t llm_init(const char* model_path) {
     struct llama_context* ctx = llama_new_context_with_model(model, cparams);
     if (!ctx) {
         fprintf(stderr, "[sonified_llama] llm_init: failed to create context (n_ctx=%d)\n", n_ctx);
+        set_last_error(12 /*ENOMEM*/, "failed to create context (likely OOM)");
         llama_free_model(model);
         if (atomic_fetch_sub(&g_backend_refs, 1) == 1) llama_backend_free();
         return NULL;
@@ -150,6 +199,7 @@ llm_handle_t llm_init(const char* model_path) {
     LLMContext* h = (LLMContext*)calloc(1, sizeof(LLMContext));
     if (!h) {
         fprintf(stderr, "[sonified_llama] llm_init: out of memory allocating context\n");
+        set_last_error(12 /*ENOMEM*/, "out of memory allocating context struct");
         llama_free(ctx);
         llama_free_model(model);
         if (atomic_fetch_sub(&g_backend_refs, 1) == 1) llama_backend_free();
