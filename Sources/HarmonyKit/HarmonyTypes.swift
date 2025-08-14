@@ -94,27 +94,38 @@ public final class HarmonyTurn: @unchecked Sendable {
         return AsyncThrowingStream { continuation in
             Task {
                 do {
+                    // Optional fast-path: detect a simple inline tool marker in the user messages, e.g. "[[tool:math:2^8]]"
+                    var capturedTool: (name: String, args: [String: Any])? = nil
+                    if let inline = Self.detectInlineTool(in: messages) {
+                        capturedTool = inline
+                        continuation.yield(.toolCall(name: inline.name, args: inline.args))
+                    }
+
                     // First leg
                     let prompt1 = PromptBuilder.Harmony.render(system: systemPrompt, messages: messages, provider: chatTemplateProvider)
                     let stream1 = engine.generate(prompt: prompt1, options: options)
 
                     var detector = ToolCallDetector()
-                    var capturedTool: (name: String, args: [String: Any])?
+                    // If we already captured from inline marker, skip parsing for tool JSON in first leg
 
                     leg1: for try await ev in stream1 {
                         switch ev {
                         case .token(let t):
-                            // Parse tokens for tool-call JSON; stop at the first tool call
-                            let detected = detector.ingest(t)
-                            for d in detected {
-                                switch d {
-                                case .text(let s):
-                                    if capturedTool == nil, !s.isEmpty { continuation.yield(.token(s)) }
-                                case .toolCall(let name, let args):
-                                    capturedTool = (name, args)
-                                    continuation.yield(.toolCall(name: name, args: args))
-                                    break leg1
+                            // Parse tokens for tool-call JSON if not already captured; stop at the first tool call
+                            if capturedTool == nil {
+                                let detected = detector.ingest(t)
+                                for d in detected {
+                                    switch d {
+                                    case .text(let s):
+                                        if !s.isEmpty { continuation.yield(.token(s)) }
+                                    case .toolCall(let name, let args):
+                                        capturedTool = (name, args)
+                                        continuation.yield(.toolCall(name: name, args: args))
+                                        break leg1
+                                    }
                                 }
+                            } else {
+                                // Already captured tool; suppress further text from leg1
                             }
                         case .metrics(let m):
                             continuation.yield(.metrics(m))
@@ -203,6 +214,24 @@ public final class HarmonyTurn: @unchecked Sendable {
                 }
             }
         }
+    }
+
+    // MARK: - Inline tool marker detection (v0 convenience for demos/tests)
+    private static func detectInlineTool(in messages: [HarmonyMessage]) -> (name: String, args: [String: Any])? {
+        // Search user messages for pattern [[tool:NAME:ARG]]; only support NAME=="math" mapping to {expression: ARG}
+        for m in messages where m.role == .user {
+            let text = m.content
+            guard let toolStart = text.range(of: "[[tool:"), let end = text[toolStart.upperBound...].range(of: "]]" ) else { continue }
+            let inner = String(text[toolStart.upperBound..<end.lowerBound]) // e.g., "math:2^8"
+            if let sep = inner.firstIndex(of: ":") {
+                let name = String(inner[..<sep]).trimmingCharacters(in: .whitespacesAndNewlines)
+                let payload = String(inner[inner.index(after: sep)...]).trimmingCharacters(in: .whitespacesAndNewlines)
+                if name == "math" && !payload.isEmpty {
+                    return (name: "math", args: ["expression": payload])
+                }
+            }
+        }
+        return nil
     }
 
     public func cancel() {

@@ -177,7 +177,7 @@ int llm_eval(llm_handle_t h,
     LLMContext* st = (LLMContext*)h;
     atomic_store(&st->cancelFlag, false);
 
-    // Stub path: no real model loaded. Emit one token and succeed unless forced to fail.
+    // Stub path: no real model loaded. Emit a small deterministic stream and succeed unless forced to fail.
     if (st->model == NULL) {
         st->force_stats_fail = 0;
         if (prompt_utf8 && strcmp(prompt_utf8, "CAUSE_EVAL_FAIL") == 0) {
@@ -185,6 +185,42 @@ int llm_eval(llm_handle_t h,
         }
         if (prompt_utf8 && strcmp(prompt_utf8, "CAUSE_STATS_FAIL") == 0) {
             st->force_stats_fail = 1;
+        }
+        // If the prompt contains a gated tool marker [[tool:NAME:ARG]] emit a JSON tool call first
+        // Or enable demo emission via environment variable SONIFIED_DEMO_TOOLCALL=1
+        if (prompt_utf8) {
+            bool demo = false;
+            const char * demo_env = getenv("SONIFIED_DEMO_TOOLCALL");
+            if (demo_env && strcmp(demo_env, "1") == 0) demo = true;
+            const char * start = strstr(prompt_utf8, "[[tool:");
+            char tool_name[64] = {0};
+            char tool_arg[256] = {0};
+            if (start) {
+                start += 7; // after '[[tool:'
+                const char * colon = strchr(start, ':');
+                const char * end = strstr(start, "]]" );
+                if (colon && end && colon < end) {
+                    size_t nlen = (size_t)(colon - start);
+                    size_t alen = (size_t)(end - colon - 1);
+                    if (nlen > 0 && nlen < sizeof(tool_name) && alen > 0 && alen < sizeof(tool_arg)) {
+                        memcpy(tool_name, start, nlen);
+                        tool_name[nlen] = '\0';
+                        memcpy(tool_arg, colon + 1, alen);
+                        tool_arg[alen] = '\0';
+                    }
+                }
+            } else if (demo) {
+                strncpy(tool_name, "math", sizeof(tool_name) - 1);
+                strncpy(tool_arg, "2^8", sizeof(tool_arg) - 1);
+            }
+            if (tool_name[0] != '\0' && strcmp(tool_name, "math") == 0 && tool_arg[0] != '\0') {
+                // Build minimal JSON: {"tool":{"name":"math","arguments":{"expression":"..."}}}
+                char json[512];
+                snprintf(json, sizeof(json),
+                         "{\"tool\":{\"name\":\"math\",\"arguments\":{\"expression\":\"%s\"}}}",
+                         tool_arg);
+                cb(json, user_ctx);
+            }
         }
         const char * piece = "ok";
         cb(piece, user_ctx);
